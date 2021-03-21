@@ -13,14 +13,5 @@ int main(int argc, char* argv[])
         game.update();
         game.render();
     }
-    /*int i = 0;
-    while (i<2)
-    {
-        game.handleEvents();
-        game.update();
-        game.render();
-        ++i;
-    }*/
-
     return 0;
 }

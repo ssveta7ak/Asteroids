@@ -6,8 +6,16 @@
 #include <iostream>
 #include <memory>
 #include <cmath>
-#include "Image.h"
 #include <windows.h>
+#include <sstream>
+#include <array>
+#include "Player.h"
+#include "Bullet.h"
+#include "Vector2.h"
+#include "BulletManager.h"
+#include "AsteroidManager.h"
+#include <math.h> 
+
 
 class Game {
 public:
@@ -19,18 +27,24 @@ public:
     void update();
     void render();
     bool running() const { return isRunning; }
-    float x_inside_window(float x);
-    float y_inside_window(float y);
+    float get_delta()const { return m_delta; }
+    void init_bullets();
+    void init_asteroids();
+    void init_player();
+    void init_window(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+    void fire_bullet();
+    void update_crossing();
 
 private:
     bool isRunning = false;
+    float m_delta = 0;
     int cnt = 0;
     SDL_Window* m_window = nullptr;
     int m_window_width;
     int m_window_height;
     SDL_Renderer* m_renderer = nullptr;
-    std::unique_ptr<Image> m_image;
-    float m_x = 0;
-    float m_y = 0;
+    std::unique_ptr<Player> m_player;
+    BulletManager m_bullets;
+    Asteroidmanager m_asteroids;
     std::chrono::time_point<std::chrono::system_clock> m_last_time = std::chrono::system_clock::now();
 };

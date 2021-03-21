@@ -51,3 +51,18 @@ void Image::draw_texture(SDL_Renderer* renderer, const SDL_Rect& dest_rect)
     SDL_RenderPresent(renderer);
 }
 
+void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip, double angle, SDL_Point* center)
+{
+    SDL_Rect src_rect;
+    src_rect.w = m_width;
+    src_rect.h = m_height;
+    src_rect.x = 0;
+    src_rect.y = 0;
+
+    //Render to screen
+    int res = SDL_RenderCopyEx(renderer, m_texture, &src_rect, &dest_rect, angle, center, flip);
+//    if (res == -1)
+    //    OutputDebugStringA(SDL_GetError());
+}
+
+
