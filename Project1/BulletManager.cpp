@@ -8,42 +8,42 @@ BulletManager::~BulletManager()
 
 void BulletManager::init(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < m_bullets.size(); ++i)
+    for (int i = 0; i < mBullets.size(); ++i)
     {
-        m_bullet = std::make_unique<Bullet>();
-        m_bullet->init(renderer);
-        m_bullets.at(i) = std::move(m_bullet);
+        mBullet = std::make_unique<Bullet>();
+        mBullet->init(renderer);
+        mBullets.at(i) = std::move(mBullet);
     }
 }
 
 std::unique_ptr<Bullet>& BulletManager::operator[] (const int index)
 {
-    return m_bullets[index];
+    return mBullets[index];
 }
 
 void BulletManager::render(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < m_bullets.size(); ++i)
+    for (int i = 0; i < mBullets.size(); ++i)
     {
-        if (m_bullets[i]->is_active())
+        if (mBullets[i]->isActive())
         {
-            m_bullets[i]->render(renderer);
+            mBullets[i]->render(renderer);
         }
     }
 }
 
-void BulletManager::update_fire_bullet(int window_width, int window_height, float delta)
+void BulletManager::updateFireBullet(int window_width, int window_height, float delta)
 {
-    for (int i = 0; i < m_bullets.size(); ++i)
+    for (auto& bullet : mBullets)
     {
-        if (m_bullets[i]->is_active())
+        if (bullet->isActive())
         {
-            m_bullets[i]->update(delta);
-             bool is_in_window = m_bullets[i]->is_inside_window(window_width, window_height);
-            if (!is_in_window)
+            bullet->update(delta);
+            bool isInWindow = bullet->isInsideWindow(window_width, window_height);
+            if (!isInWindow)
             {
-                m_bullets[i]->set_active(false);
-                m_bullets[i]->set_position(Vector2(0, 0));
+                bullet->setActive(false);
+                bullet->setPosition(Vector2(0, 0));
             }
         }
     }

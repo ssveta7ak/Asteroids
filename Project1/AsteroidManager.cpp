@@ -8,41 +8,39 @@ Asteroidmanager::~Asteroidmanager()
 
 void Asteroidmanager::init(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < m_asteroids.size(); ++i)
+    for (int i = 0; i < mAsteroids.size(); ++i)
     {
-        m_asteroid = std::make_unique<Asteroid>();
-        m_asteroid->init(renderer);
-        m_asteroids.at(i) = std::move(m_asteroid);
+        mAsteroid = std::make_unique<Asteroid>();
+        mAsteroid->init(renderer);
+        mAsteroids.at(i) = std::move(mAsteroid);
     }
+    mActiveCount = mAsteroids.size();
 }
 
 std::unique_ptr<Asteroid>& Asteroidmanager::operator[] (const int index)
 {
-    return m_asteroids[index];
+    return mAsteroids[index];
 }
 
 void Asteroidmanager::render(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < m_asteroids.size(); ++i)
+    for (int i = 0; i < mAsteroids.size(); ++i)
     {
-        if (m_asteroids[i]->is_active())
+        if (mAsteroids[i]->isActive())
         {
-            m_asteroids[i]->render(renderer);
+            mAsteroids[i]->render(renderer);
         }
     }
 }
 
 void Asteroidmanager::update(int window_width, int window_height, float delta)
 {
-    for (int i = 0; i < m_asteroids.size(); ++i)
+    for (int i = 0; i < mAsteroids.size(); ++i)
     {
-        if (m_asteroids[i]->is_active())
+        if (mAsteroids[i]->isActive())
         {
-            m_asteroids[i]->update(delta, window_width, window_height);
+            mAsteroids[i]->update(delta, window_width, window_height);
         }
-       // bool is_in_window = m_asteroids[i]->is_inside_window(window_width, window_height);
-       
     }
 
 }
-

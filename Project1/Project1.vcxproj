@@ -81,6 +81,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>E:\WORK\CA\Dev\SDL2_mixer-2.0.4\include;E:\WORK\CA\Dev\SDL2_ttf-2.0.15\include;E:\WORK\CA\Dev\SDL2_image-2.0.5\include;E:\WORK\CA\Dev\SDL2-2.0.14\include;$(IncludePath)</IncludePath>
+    <LibraryPath>E:\WORK\CA\Dev\SDL2_mixer-2.0.4\lib\x64;E:\WORK\CA\Dev\SDL2_ttf-2.0.15\lib\x64;E:\WORK\CA\Dev\SDL2_image-2.0.5\lib\x64;E:\WORK\CA\Dev\SDL2-2.0.14\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -123,10 +125,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;SDL2_mixer.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,6 +150,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Asteroid.cpp" />
     <ClCompile Include="AsteroidManager.cpp" />
     <ClCompile Include="Bullet.cpp" />
@@ -155,9 +160,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SmallAsteroid.cpp" />
+    <ClCompile Include="SmallAsteroidManager.cpp" />
     <ClCompile Include="Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Asteroid.h" />
     <ClInclude Include="AsteroidManager.h" />
     <ClInclude Include="Bullet.h" />
@@ -166,6 +174,8 @@
     <ClInclude Include="Image.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SmallAsteroid.h" />
+    <ClInclude Include="SmallAsteroidManager.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

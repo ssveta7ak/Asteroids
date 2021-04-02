@@ -1,11 +1,2 @@
 ﻿C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Microsoft\VC\v160\Microsoft.CppBuild.targets(519,5): warning MSB8028: The intermediate directory (Debug\) contains files shared from another project (Project1.vcxproj).  This can lead to incorrect clean and rebuild behavior.
-  Game.cpp
-  The contents of <numbers> are available only with C++20 or later.
-E:\WORK\CA\Game\Project1\Player.h(23,47): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-E:\WORK\CA\Game\Project1\Game.cpp(72,84): warning C4100: 'fullscreen': unreferenced formal parameter
-E:\WORK\CA\Game\Project1\Game.cpp(72,71): warning C4100: 'height': unreferenced formal parameter
-E:\WORK\CA\Game\Project1\Game.cpp(72,60): warning C4100: 'width': unreferenced formal parameter
-E:\WORK\CA\Game\Project1\Game.cpp(72,50): warning C4100: 'ypos': unreferenced formal parameter
-E:\WORK\CA\Game\Project1\Game.cpp(72,40): warning C4100: 'xpos': unreferenced formal parameter
-E:\WORK\CA\Game\Project1\Game.cpp(72,29): warning C4100: 'title': unreferenced formal parameter
-  Project1.vcxproj -> E:\WORK\CA\Game\Debug\DesctopProject.exe
+LINK : fatal error LNK1104: cannot open file 'SDL2main.lib'

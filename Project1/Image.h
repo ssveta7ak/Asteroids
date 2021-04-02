@@ -2,7 +2,7 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
-#include <iostream>
+#include <SDL_ttf.h>
 #include <string>
 #include <cassert> 
 #include <windows.h>
@@ -13,19 +13,21 @@ public:
     Image();
     ~Image();
 
-    bool create_texture(const char* path, SDL_Renderer* renderer);
-    void draw_texture(SDL_Renderer* renderer, const SDL_Rect& dest_rect);
-    SDL_Texture* get_texture() const;
-    int width() const { return m_width; }
-    int height() const { return m_height; }
-    void render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip = SDL_FLIP_NONE, double angle = 0.0, SDL_Point* center = NULL);
-
+    int width() const { return mWidth; }
+    int height() const { return mHeight; }
+    bool createTexture(const char* path, SDL_Renderer* renderer);
+    void drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect);
+    SDL_Texture* getTexture() const;
+    void render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip = SDL_FLIP_NONE,
+                double angle = 0.0, SDL_Point* center = NULL);
+    //Creates image from font string
+    bool createFromRenderedText(std::string textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer);
 
 private:
-    SDL_Surface* m_image = nullptr;
-    SDL_Texture* m_texture = nullptr;
+    SDL_Surface* mImage = nullptr;
+    SDL_Texture* mTexture = nullptr;
 
     //Image dimensions
-    int m_width;
-    int m_height;
+    int mWidth;
+    int mHeight;
 };

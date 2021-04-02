@@ -5,57 +5,57 @@ Player::Player()
 
 Player::~Player()
 {
-    m_image.reset();
+    mImage.reset();
 }
 
 void Player::init(SDL_Renderer* renderer)
 {
     const char* path = "assets/ship.png";
-    m_image = std::make_unique<Image>();
-    m_image->create_texture(path, renderer);
-    m_speed = 1;
-    m_radius = radius()/2;
-    m_active = true;
+    mImage = std::make_unique<Image>();
+    mImage->createTexture(path, renderer);
+    mSpeed = 1;
+    mRadius = radius()/2;
+    mActive = true;
 }
 
 void Player::render(SDL_Renderer* renderer)
 {
     SDL_Rect dest_rect;
-    dest_rect.w = m_image->width();
-    dest_rect.h = m_image->height();
-    dest_rect.x = static_cast<int>(round(m_position.x));
-    dest_rect.y = static_cast<int>(round(m_position.y));
+    dest_rect.w = mImage->width();
+    dest_rect.h = mImage->height();
+    dest_rect.x = static_cast<int>(round(mPosition.x));
+    dest_rect.y = static_cast<int>(round(mPosition.y));
     
-    if (m_active)
+    if (mActive)
     {
-        m_image->render(renderer, dest_rect, SDL_FLIP_NONE, m_degrees);
+        mImage->render(renderer, dest_rect, SDL_FLIP_NONE, mDegrees);
     }
 }
 
-void Player::set_angle(float angle)
+void Player::setAngle(float angle)
 {
-    m_degrees = angle;
+    mDegrees = angle;
 }
 
-void Player::change_angle_to(float delta_degrees)
+void Player::changeAngleTo(float delta_degrees)
 {
-    set_angle(m_degrees + delta_degrees);
-    if (m_degrees > 359.0)
+    setAngle(mDegrees + delta_degrees);
+    if (mDegrees > 359.0f)
     {
-        set_angle(m_degrees - 360.0);
+        setAngle(mDegrees - 360.0);
     }
-    if (m_degrees < 0.0)
+    if (mDegrees < 0.0)
     {
-        set_angle(360.0);
+        setAngle(360.0);
     }
 }
 
-void Player::move_forward(float delta, int window_width, int window_height, int forward )
+void Player::moveForward(float delta, int window_width, int window_height, int forward )
 {
     Vector2 turnvect;
-    Vector2 b;
+    //Vector2 b;
     Vector2 move_position;
-    turnvect = Vector2::make_rotation(m_rad_moving);
+    turnvect = Vector2::makeRotation(mRadMoving);
 
    /* b.x = -turnvect.y * m_position.y / turnvect.x;
     b.y = m_position.y;
@@ -64,10 +64,10 @@ void Player::move_forward(float delta, int window_width, int window_height, int 
     switch (forward)
     {
     case 1:
-        move_position = m_position + turnvect * m_speed * delta;
+        move_position = mPosition + turnvect * mSpeed * delta;
         break;
     case 2:
-        move_position = m_position - turnvect * m_speed * delta;
+        move_position = mPosition - turnvect * mSpeed * delta;
         break;
     case 3:
       //  move_position = m_position - b * SPEED * delta;
@@ -77,38 +77,38 @@ void Player::move_forward(float delta, int window_width, int window_height, int 
         break;
     }
 
-    move_position = is_inside_window(move_position, window_width, window_height);
-    set_position(move_position);
+    move_position = isInsideWindow(move_position, window_width, window_height);
+    setPosition(move_position);
 }
 
-void Player::speed_up(float delta, int window_width, int window_height)
+void Player::speedUp(float delta, int window_width, int window_height)
 {
-    set_speed(m_speed + m_acceleration);
-    set_forward(true);
-    m_rad_moving = radians();
-    move_forward(delta, window_width, window_height, 1);
+    setSpeed(mSpeed + mAcceleration);
+    setForward(true);
+    mRadMoving = radians();
+    moveForward(delta, window_width, window_height, 1);
 }
 
-void Player::speed_down(float delta, int window_width, int window_height)
+void Player::speedDown(float delta, int window_width, int window_height)
 {
-    if (m_is_forward)
+    if (mIsForward)
     {
-        set_speed(m_speed - m_acceleration);
-        m_rad_moving = radians();
-        move_forward(delta, window_width, window_height, 1);
+        setSpeed(mSpeed - mAcceleration);
+        mRadMoving = radians();
+        moveForward(delta, window_width, window_height, 1);
     }
-    if (m_speed <= 100)
+    if (mSpeed <= 100)
     {
-        set_forward(false);
-        m_rad_moving = radians();
-        move_forward(delta, window_width, window_height, 2);
+        setForward(false);
+        mRadMoving = radians();
+        moveForward(delta, window_width, window_height, 2);
     }
 }
 
-Vector2 Player::is_inside_window(Vector2 position, int window_width, int window_height)
+Vector2 Player::isInsideWindow(Vector2 position, int window_width, int window_height)
 {
     Vector2 result;
-    float max_x = window_width - m_image->width();
+    float max_x = window_width - mImage->width();
     if (position.x < 0)
         result.x = max_x;
     else if (position.x >= max_x)
@@ -116,7 +116,7 @@ Vector2 Player::is_inside_window(Vector2 position, int window_width, int window_
     else
         result.x = position.x;
 
-    float max_y = window_height - m_image->height();
+    float max_y = window_height - mImage->height();
 
     if (position.y < 0)
         result.y = max_y;
@@ -128,22 +128,22 @@ Vector2 Player::is_inside_window(Vector2 position, int window_width, int window_
     return result;
 }
 
-void Player::rotate_to_mouse(const Vector2& point)
+void Player::rotateToMouse(const Vector2& point)
 {
     Vector2 mouse;
     mouse = point - center();
     mouse = mouse.normalized();
-    Vector2 direct_pos = Vector2::make_rotation(radians());
+    Vector2 direct_pos = Vector2::makeRotation(radians());
 
     float ang = Vector2::angle(direct_pos, mouse);
 
-    bool res = mouse.is_left(direct_pos);
+    bool res = mouse.isLeft(direct_pos);
     if (res)
     {
-        change_angle_to(ang);
+        changeAngleTo(ang);
     }
     else
     {
-        change_angle_to(-ang);
+        changeAngleTo(-ang);
     }
 }

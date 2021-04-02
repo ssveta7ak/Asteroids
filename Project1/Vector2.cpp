@@ -83,7 +83,7 @@ float Vector2::angle(const Vector2& v1, const Vector2& v2)
 
 Vector2 Vector2::normalized() const
 {
-    if (lenght_squared() != 0)
+    if (lenghtSquared() != 0)
     {
         return *this / lenght();
     }
@@ -93,12 +93,12 @@ Vector2 Vector2::normalized() const
     }
 }
 
-Vector2 Vector2::make_rotation(float angle)
+Vector2 Vector2::makeRotation(float angle)
 {
     return Vector2(static_cast<float>(cos(angle)), static_cast<float>(sin(angle))); 
 }
 
-bool Vector2::is_left(const Vector2& v)//return true if *this vector is in the left side of vector v
+bool Vector2::isLeft(const Vector2& v)//return true if *this vector is in the left side of vector v
 {
     Vector2 rot90(-(this->y), this->x); //this is vector *this which was rorated to 90 degrees to the left.
     float dot_vect = dot(v, rot90);
@@ -113,5 +113,3 @@ float Vector2::distance(const Vector2& pointA, const Vector2& pointB)
     float diff = (pointB.x - pointA.x) * (pointB.x - pointA.x) + (pointB.y - pointA.y) * (pointB.y - pointA.y);
     return sqrt(diff);
 }
-
-
