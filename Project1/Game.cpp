@@ -1,32 +1,18 @@
 #include "Game.h"
 
 Game::Game()
-{}
+{
+    mLastTime = std::chrono::system_clock::now();
+    mLastTimeBulletSpawn = std::chrono::system_clock::now();
+}
 
 Game::~Game()
 {
     mPlayer.reset();
-    mAnimation.reset();
-    mGameOverText.reset();
-    mInstruction.reset();
-    mInstruction2.reset();
-    mWinText.reset();
-    Mix_FreeMusic(mShot);
-    Mix_FreeMusic(mExplosion);
 
-    for (int i = 0; i < mBullets.size(); ++i)
+    for (std::unique_ptr<Bullet>& bullet: mBullets)
     {
-        mBullets[i].reset();
-    }
-
-    for (int i = 0; i < mAsteroids.size(); ++i)
-    {
-        mAsteroids[i].reset();
-    }
-
-    for (int i = 0; i < mSmallAsteroids.size(); ++i)
-    {
-        mSmallAsteroids[i].reset();
+        bullet.reset();
     }
 
     if (mRenderer)
@@ -53,66 +39,13 @@ void Game::initBullets()
 
 void Game::initAsteroids()
 {
-    mAsteroids.init(mRenderer);
-    mSmallAsteroids.init(mRenderer);
+    mAsteroids.init(mRenderer, true, 10, mWindowWidth, mWindowHeight);
+    mSmallAsteroids.init(mRenderer, false, 30, mWindowWidth, mWindowHeight);
 }
 
 void Game::initAnimation()
 {
     mAnimation.init(mRenderer);
-}
-
-bool Game::initText()
-{
-    bool success = true;
-    SDL_Color textColor = { 255, 0, 0 };
-    mGameOverText = std::make_unique<Image>();
-    if (!mGameOverText->createFromRenderedText("GAME OVER", textColor, 70, mRenderer))
-    {
-        printf("Failed to render text texture!\n");
-        success = false;
-    }
-    textColor = { 255, 255, 255 };
-    mInstruction = std::make_unique<Image>();
-    if (!mInstruction->createFromRenderedText("ESCAPE:  Exit Game             SPACE:  New Game", textColor, 25, mRenderer))
-    {
-        printf("Failed to render text texture!\n");
-        success = false;
-    }
-    textColor = { 255, 255, 255 };
-    mInstruction2 = std::make_unique<Image>();
-    if (!mInstruction2->createFromRenderedText("ESCAPE:  Exit Game             SPACE:  Continue", textColor, 25, mRenderer))
-    {
-        printf("Failed to render text texture!\n");
-        success = false;
-    }
-    textColor = { 0, 255, 0 };
-    mWinText = std::make_unique<Image>();
-    if (!mWinText->createFromRenderedText("YOU WIN!", textColor, 70, mRenderer))
-    {
-        printf("Failed to render text texture!\n");
-        success = false;
-    }
-    return success;
-}
-
-bool Game::initSound()
-{
-    bool success = true;
-    //Load sound effects
-    mShot = Mix_LoadMUS("assets/sound/shot.wav");
-    if (!mShot)
-    {
-        printf("Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
-    mExplosion = Mix_LoadMUS("assets/sound/explosion.wav");
-    if (!mExplosion)
-    {
-        printf("Failed to load scratch sound effect! SDL_mixer Error: %s\n", Mix_GetError());
-        success = false;
-    }
-    return success;
 }
 
 void Game::initWindow(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
@@ -160,22 +93,32 @@ void Game::initPlayer()
 
 void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
 {
-    initWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+    initWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, fullscreen);
     initPlayer();
     initBullets();
     initAsteroids();
     initAnimation();
-    initText();
-    initSound();
+    mText.init(mRenderer);
+    mSound.init();
+
+    mBullets.addListener(&mSound);
+    mCollisions.addListener((AsteroidDestroyedListener*)&mSound);
+    mCollisions.addListener((AsteroidDestroyedListener*)&mAnimation);
+    mCollisions.addListener(this);
+    mCollisions.addListener((PlayerKilledListner*)&mSound);
+    mCollisions.addListener((PlayerKilledListner*)&mAnimation);
+    
 }
 
 void Game::handleEvents()
 {
     using namespace std::chrono;
-    auto current_time = system_clock::now();
-    duration<float> fs = current_time - mLastTime;
+    auto timeNow = system_clock::now();
+    duration<float> fs = timeNow - mLastTime;
     mDelta = fs.count();
-    mLastTime = current_time;
+    mLastTime = timeNow;
+    float angle = 6.0;
+    const float calmDown = 200.0;
     int mouseX;
     int mouseY;
     if (mGameWin)
@@ -193,7 +136,7 @@ void Game::handleEvents()
             case SDLK_ESCAPE:
                 isRunning = false;
                 break;
-            case SDLK_SPACE:
+            case SDLK_RETURN:
                 isRunning = true;
                 newGame();
                 break;
@@ -205,50 +148,88 @@ void Game::handleEvents()
     }
     else if (mPlayer)
     {
-        
         SDL_Event event;
+        
         while (SDL_PollEvent(&event) != 0 )
         {
             const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
             if (currentKeyStates[SDL_SCANCODE_RIGHT] && currentKeyStates[SDL_SCANCODE_SPACE])
             {
-                mPlayer->changeAngleTo(4.0);
-                fireBullet();
-                Mix_PlayMusic(mShot, 1);
+                mPlayer->changeAngleTo(angle);
+
+                auto currentTime = system_clock::now();
+                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
+                if (f.count() >= calmDown)
+                {
+                    mLastTimeBulletSpawn = currentTime;
+                    fireBullet();
+                }
             }
             else if (currentKeyStates[SDL_SCANCODE_LEFT] && currentKeyStates[SDL_SCANCODE_SPACE])
             {
-                 mPlayer->changeAngleTo(-4.0);
-                 fireBullet();
-                 Mix_PlayMusic(mShot, 1);
+                 mPlayer->changeAngleTo(-angle);
+
+                 auto currentTime = system_clock::now();
+                 duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
+                 if (f.count() >= calmDown)
+                 {
+                     mLastTimeBulletSpawn = currentTime;
+                     fireBullet();
+                 }
+            }
+            else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_SPACE])
+            {
+                mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
+
+                auto currentTime = system_clock::now();
+                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
+                if (f.count() >= calmDown)
+                {
+                    mLastTimeBulletSpawn = currentTime;
+                    fireBullet();
+                }
+            }
+            else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_SPACE])
+            {
+                mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
+
+                auto currentTime = system_clock::now();
+                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
+                if (f.count() >= calmDown)
+                {
+                    mLastTimeBulletSpawn = currentTime;
+                    fireBullet();
+                }
             }
             else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
             {
-                  mPlayer->changeAngleTo(-4.0);
+                 mPlayer->changeAngleTo(-angle);
                  mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
             {
-                 mPlayer->changeAngleTo(4.0);
+                 mPlayer->changeAngleTo(angle);
                  mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
             {
-                 mPlayer->changeAngleTo(-4.0);
+                 mPlayer->changeAngleTo(-angle);
                  mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
             {
-                 mPlayer->changeAngleTo(4.0);
+                 mPlayer->changeAngleTo(angle);
                  mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_LEFT])
             {
-                mPlayer->changeAngleTo(-4.0);
+                mPlayer->changeAngleTo(-angle);
+              //  mPlayer->goRight(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_RIGHT])
             {
-                mPlayer->changeAngleTo(4.0);
+                mPlayer->changeAngleTo(angle);
+              //  mPlayer->goLeft(mDelta, mWindowWidth, mWindowHeight);
             }
             else if (currentKeyStates[SDL_SCANCODE_UP])
             {
@@ -260,8 +241,14 @@ void Game::handleEvents()
             }
             else if (currentKeyStates[SDL_SCANCODE_SPACE])
             {
-                fireBullet();
-                Mix_PlayMusic(mShot, 1);
+                auto currentTime = system_clock::now();
+                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
+                if (f.count() >= calmDown)
+                {
+                    mLastTimeBulletSpawn = currentTime;
+                    fireBullet();
+                }
+                
             }
             else if (currentKeyStates[SDL_SCANCODE_ESCAPE])
             {
@@ -273,31 +260,7 @@ void Game::handleEvents()
             case SDL_QUIT:
                 isRunning = false;
                 break;
-            /*case SDL_KEYDOWN:
-
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_LEFT:
-                      mPlayer->changeAngleTo(-4.0);
-                    break;
-                case SDLK_RIGHT:
-                    mPlayer->changeAngleTo(4.0);
-                    break;
-                case SDLK_UP:
-                    mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
-                    break;
-                case SDLK_DOWN:
-                    mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
-                    break;
-                case SDLK_ESCAPE:
-                    isRunning = false;
-                    break;
-                case SDLK_SPACE:
-                    fireBullet();
-                    Mix_PlayMusic(mShot, 1);
-                    break;
-                }
-                break;*/
+            
             case SDL_MOUSEMOTION:
                 /* mouse.x = event.motion.x;
                  mouse.y = event.motion.y;
@@ -316,7 +279,7 @@ void Game::handleEvents()
             }
         }
     }
-    else
+    else // Game fail
     {
         SDL_Event event;
         SDL_PollEvent(&event);
@@ -331,7 +294,7 @@ void Game::handleEvents()
             case SDLK_ESCAPE:
                 isRunning = false;
                 break;
-            case SDLK_SPACE:
+            case SDLK_RETURN:
                 isRunning = true;
                 mGameFail = false;
                 initPlayer();
@@ -346,12 +309,12 @@ void Game::handleEvents()
 
 void Game::update()
 {
-    if (mSmallAsteroids.mActiveCount == 0 && mAsteroids.mActiveCount == 0)
+    if (mSmallAsteroids.activeCount() == 0 && mAsteroids.activeCount() == 0)
     {
         mGameWin = true;
-        for (int i = 0; i < mBullets.size(); ++i)
+        for (std::unique_ptr<Bullet>& bullet: mBullets)
         {
-            mBullets[i]->setActive(false);
+            bullet->setActive(false);
         }
         return;
     }
@@ -368,7 +331,7 @@ void Game::update()
         {
             mPlayer->moveForward(mDelta, mWindowWidth, mWindowHeight, 2);
         }
-        updateCrossing();
+        mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
     }
 }
 
@@ -379,44 +342,27 @@ void Game::render()
     mBullets.render(mRenderer);
     mAsteroids.render(mRenderer);
     mSmallAsteroids.render(mRenderer);
-    animate();
-    
+    mAnimation.animate();
     
     if (mGameFail)
     {
-        SDL_Rect dest_rect;
-        dest_rect.w = mGameOverText->width();
-        dest_rect.h = mGameOverText->height();
-        dest_rect.x = 170;
-        dest_rect.y = 200;
+        int x1 = mWindowWidth / 2 - mText.GameOverText()->width() / 2;
+        int y1 = mWindowHeight / 2 - mText.GameOverText()->height();
+        mText.render(mRenderer, mText.GameOverText(), x1, y1);
 
-        mGameOverText->render(mRenderer, dest_rect);
-
-        SDL_Rect dest_rect2;
-        dest_rect2.w = mInstruction2->width();
-        dest_rect2.h = mInstruction2->height();
-        dest_rect2.x = 100;
-        dest_rect2.y = 550;
-
-        mInstruction2->render(mRenderer, dest_rect2);
+        int x2 = mWindowWidth / 2 - mText.Instruction2()->width() / 2;
+        int y2 = mWindowHeight - mText.Instruction2()->height();
+        mText.render(mRenderer, mText.Instruction2(), x2, y2);
     }
     else if (mGameWin)
     {
-        SDL_Rect dest_rect;
-        dest_rect.w = mWinText->width();
-        dest_rect.h = mWinText->height();
-        dest_rect.x = 170;
-        dest_rect.y = 200;
+        int x1 = mWindowWidth / 2 - mText.WinText()->width() / 2;
+        int y1 = (mWindowHeight / 2) - mText.WinText()->height();
+        mText.render(mRenderer, mText.WinText(), x1, y1);
 
-        mWinText->render(mRenderer, dest_rect);
-
-        SDL_Rect dest_rect2;
-        dest_rect2.w = mInstruction->width();
-        dest_rect2.h = mInstruction->height();
-        dest_rect2.x = 100;
-        dest_rect2.y = 550;
-
-        mInstruction->render(mRenderer, dest_rect2);
+        int x2 = mWindowWidth / 2 - mText.Instruction()->width() / 2;
+        int y2 = mWindowHeight - mText.Instruction()->height();
+        mText.render(mRenderer, mText.Instruction(), x2, y2);
 
     }
     else if (mPlayer)
@@ -429,163 +375,9 @@ void Game::render()
 
 void Game::fireBullet()
 {
-    for (int i = 0; i < mBullets.size(); ++i)
-    {
-        if (!mBullets[i]->isActive())
-        {
-            mBullets[i]->setActive(true);
-            mBullets[i]->setPosition(mPlayer->center());
-            mBullets[i]->setRadians(mPlayer->radians());
-            break;
-        }
-    }
-}
-
-void Game::updateCrossing()
-{
-    //check crossing bullet and asteroid
-    for (int i = 0; i < mBullets.size(); ++i)
-    {
-        if (mBullets[i]->isActive())
-        {
-            for (int j = 0; j < mAsteroids.size(); ++j)
-            {
-                Object* obj1 = mBullets[i].get();
-                Object* obj2 = mAsteroids[j].get();
-
-                bool iscross = Object::iscrossed(*obj1, *obj2);
-                if (iscross)
-                {
-                     Mix_PlayMusic(mExplosion, 1);
-                    mAnimation.isActive = true;
-                    mAnimation.setPosition(mAsteroids[j]->position());
-
-                    //create two small asteroids after destruction big asteroid
-                    for (int k = 0; k < mSmallAsteroids.size(); ++k)
-                    {
-                        if (!mSmallAsteroids[k]->isActive())
-                        {
-                            mSmallAsteroids[k]->setActive(true);
-                            mSmallAsteroids[k]->setPosition(mAsteroids[j]->position());
-                            ++mSmallAsteroids.mActiveCount;
-                            for (int t = k; t < mSmallAsteroids.size(); ++t)
-                            {
-                                if (!mSmallAsteroids[t]->isActive())
-                                {
-                                    mSmallAsteroids[t]->setActive(true);
-                                    mSmallAsteroids[t]->setPosition(mAsteroids[j]->position());
-                                    ++mSmallAsteroids.mActiveCount;
-                                    break;
-                                }
-                            }
-                            break;
-                        }
-                    }
-                    --mAsteroids.mActiveCount;
-                     mAsteroids[j]->reset();
-                    mBullets[i]->reset();
-                    break;
-                }
-            }
-        }
-       
-    }
-
-    //check crossing bullet and small asteroid
-    for (int i = 0; i < mBullets.size(); ++i)
-    {
-        if (mBullets[i]->isActive())
-        {
-            for (int j = 0; j < mSmallAsteroids.size(); ++j)
-            {
-                if (mSmallAsteroids[j]->isActive())
-                {
-                    Object* obj1 = mBullets[i].get();
-                    Object* obj2 = mSmallAsteroids[j].get();
-
-                    bool iscross = Object::iscrossed(*obj1, *obj2);
-                    if (iscross)
-                    {
-                        Mix_PlayMusic(mExplosion, 1);
-                        mAnimation.isActive = true;
-                        mAnimation.setPosition(mSmallAsteroids[j]->position());
-                        --mSmallAsteroids.mActiveCount;
-                         mSmallAsteroids[j]->reset();
-                        mBullets[i]->reset();
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    //check crossing player and asteroid
-    for (int i = 0; i < mAsteroids.size(); ++i)
-    {
-        if (mPlayer->isActive())
-        {
-            Object* obj1 = mAsteroids[i].get();
-            Object* obj2 = mPlayer.get();
-            bool iscross = Object::iscrossed(*obj1, *obj2);
-            if (iscross)
-            {
-                Mix_PlayMusic(mExplosion, 1);
-                deletePlayer();
-                mAnimation.isActive = true;
-                mAnimation.setPosition(mAsteroids[i]->position());
-                --mAsteroids.mActiveCount;
-                mAsteroids[i]->reset();
-                mGameFail = true;
-                return;
-            }
-        }
-    }
-
-    //check crossing player and small asteroid
-    for (int i = 0; i < mSmallAsteroids.size(); ++i)
-    {
-        if (mSmallAsteroids[i]->isActive() && mPlayer->isActive())
-        {
-            Object* obj1 = mSmallAsteroids[i].get();
-            Object* obj2 = mPlayer.get();
-            bool iscross = Object::iscrossed(*obj1, *obj2);
-            if (iscross)
-            {
-                Mix_PlayMusic(mExplosion, 1);
-                deletePlayer();
-                mAnimation.isActive = true;
-                mAnimation.setPosition(mSmallAsteroids[i]->position());
-                --mSmallAsteroids.mActiveCount;
-                mSmallAsteroids[i]->reset();
-                mGameFail = true;
-                return;
-            }
-        }
-    }
-}
-
-
-
-void Game::animate()
-{
-    if (mAnimation.isActive && mAnimation.mDuration > 0)
-    {
-        //Renmder current frame
-        SDL_Rect* currentClip = &mAnimation.mSpriteClips[frame / 3];
-        mAnimation.render(mRenderer, mAnimation.position().x, mAnimation.position().y, currentClip);
-        ++frame;
-
-        //Cycle animation
-        if (frame / 3 >= mAnimation.ANIMATION_FRAMES)
-        {
-            frame = 0;
-        }
-        --mAnimation.mDuration;
-    }
-    else if (mAnimation.mDuration <= 0)
-    {
-        mAnimation.reset();
-    }
+    Bullet* bullet = mBullets.spawnBullet();
+    bullet->setPosition(mPlayer->center());
+    bullet->setAngle(mPlayer->angle());
 }
 
 void Game::deletePlayer()
@@ -598,14 +390,20 @@ void Game::newGame()
     mGameWin = false;
     mGameFail = false;
     initPlayer();
-    for (int i = 0; i < mAsteroids.size(); ++i)
+    for ( Asteroid& asteroid : mAsteroids)
     {
-        mAsteroids[i]->setActive(true);
-        mAsteroids[i]->setRadians(Asteroid::randomFloat(0.0, 2 * M_PI));
-        float  a = Asteroid::randomFloat(0.0, 800.0);
-        float  b = Asteroid::randomFloat(0.0, 600.0);
-        mAsteroids[i]->setPosition(Vector2(a, b));
+        asteroid.setActive(true);
+        asteroid.setAngle(Asteroid::randomFloat(0.0, 2 * M_PI));
+        float  a = Object::randomFloat(0.0, mWindowWidth);
+        float  b = Object::randomFloat(0.0, mWindowHeight);
+        asteroid.setPosition(Vector2(a, b));
     }
-    mAsteroids.mActiveCount = mAsteroids.size();
-    mSmallAsteroids.mActiveCount = 0;
+    mAsteroids.setActiveCount(mAsteroids.size());
+    mSmallAsteroids.setActiveCount(0);
+}
+
+void Game::onPlayerKilled(const Asteroid& asteroid)
+{
+    deletePlayer();
+    mGameFail = true;
 }

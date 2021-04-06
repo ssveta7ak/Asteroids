@@ -1,16 +1,22 @@
 #pragma once
 
-#include <random>
 #include "Object.h"
 
-class Asteroid: public Object
+class Asteroid : public Object
 {
 public:
-    Asteroid();
+    Asteroid() = default;
+
+    Asteroid(const Asteroid& rhs) = delete;
+    Asteroid& operator=(const Asteroid& rhs) = delete;
+
+    Asteroid(Asteroid&& rhs) = default;
+    Asteroid& operator=(Asteroid&& rhs) = default;
+
     virtual ~Asteroid() override;
 
+    void init(SDL_Renderer* renderer, bool big, int width, int height);
     virtual void init(SDL_Renderer* renderer) override;
-    Vector2 isInsideWindow(Vector2 position, int window_width, int window_height);
-    void update(float delta, int window_width, int window_height);
-    static float randomFloat(float a, float b);
+    Vector2 isInsideWindow(Vector2 position, int windowWidth, int windowHeight);
+    void update(float delta, int windowWidth, int windowHeight);
 };

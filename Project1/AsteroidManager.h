@@ -1,23 +1,23 @@
 #pragma once
 
-#include <array>
-#include <random>
+#include <vector>
 #include "Asteroid.h"
 
-class Asteroidmanager
+class AsteroidManager final
 {
 public:
-    Asteroidmanager();
-    virtual ~Asteroidmanager();
-
-    void init(SDL_Renderer* renderer);
-    int size() { return mAsteroids.size(); }
-    std::unique_ptr<Asteroid>& operator[] (const int index);
+    void init(SDL_Renderer* renderer, bool isBig, int count, int width, int height);
     void render(SDL_Renderer* renderer);
-    void update(int window_width, int window_height, float delta);
-    int mActiveCount;
+    void update(int windowWidth, int windowHeight, float delta);
+    void setActiveCount(int count) { mActiveCount = count; }
+    int activeCount() const { return mActiveCount; }
+    int size() const { return static_cast<int>(mAsteroids.size()); }
+
+    Asteroid& operator[] (const int index);
+    std::vector<Asteroid>::iterator begin() { return mAsteroids.begin(); }
+    std::vector<Asteroid>::iterator end() { return mAsteroids.end(); }
 
 private:
-    std::unique_ptr<Asteroid> mAsteroid;
-    std::array<std::unique_ptr<Asteroid>, 10> mAsteroids;
+    int mActiveCount = 0;
+    std::vector<Asteroid> mAsteroids;
 };

@@ -151,31 +151,36 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationManager.cpp" />
     <ClCompile Include="Asteroid.cpp" />
     <ClCompile Include="AsteroidManager.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="BulletManager.cpp" />
+    <ClCompile Include="CollisionManager.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
-    <ClCompile Include="SmallAsteroid.cpp" />
-    <ClCompile Include="SmallAsteroidManager.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
+    <ClCompile Include="UIManager.cpp" />
     <ClCompile Include="Vector2.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationManager.h" />
     <ClInclude Include="Asteroid.h" />
     <ClInclude Include="AsteroidManager.h" />
     <ClInclude Include="Bullet.h" />
     <ClInclude Include="BulletManager.h" />
+    <ClInclude Include="CollisionManager.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="Listener.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
-    <ClInclude Include="SmallAsteroid.h" />
-    <ClInclude Include="SmallAsteroidManager.h" />
+    <ClInclude Include="SoundManager.h" />
+    <ClInclude Include="UIManager.h" />
     <ClInclude Include="Vector2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

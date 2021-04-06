@@ -1,13 +1,19 @@
-#include "SDL.h"
 #include "Game.h"
-#include <windows.h>
+#include "nlohmann/json.hpp"
+#include <fstream> 
 
+using json = nlohmann::json;
 
 int main(int argc, char* argv[])
 {
+    std::ifstream ifs("assets/settings.json");
+    json jf = json::parse(ifs);
+    int width = jf["width"];
+    int height = jf["height"];
+    bool fullscreen = jf["fullscreen"];
+
     Game game;
-    OutputDebugStringA("Test message!!!!!!!!!!!!\n");
-    game.init("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, false);
+    game.init("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, fullscreen);
     while (game.running()) 
     {
         game.handleEvents();

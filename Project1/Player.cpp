@@ -18,7 +18,7 @@ void Player::init(SDL_Renderer* renderer)
     mActive = true;
 }
 
-void Player::render(SDL_Renderer* renderer)
+void Player::render(SDL_Renderer* renderer) const
 {
     SDL_Rect dest_rect;
     dest_rect.w = mImage->width();
@@ -28,99 +28,112 @@ void Player::render(SDL_Renderer* renderer)
     
     if (mActive)
     {
-        mImage->render(renderer, dest_rect, SDL_FLIP_NONE, mDegrees);
+        mImage->render(renderer, dest_rect, SDL_FLIP_NONE, DEGREES_FROM_RADIANS(mAngle));
     }
 }
 
-void Player::setAngle(float angle)
+
+
+void Player::changeAngleTo(float deltaDegrees)
 {
-    mDegrees = angle;
-}
-
-void Player::changeAngleTo(float delta_degrees)
-{
-    setAngle(mDegrees + delta_degrees);
-    if (mDegrees > 359.0f)
+    setAngle(mAngle + RADIANS_FROM_DEGREES(deltaDegrees));
+    if (mAngle >= 2 * M_PI)
     {
-        setAngle(mDegrees - 360.0);
+        setAngle(mAngle - 2 * M_PI);
     }
-    if (mDegrees < 0.0)
+    if (mAngle < 0.0)
     {
-        setAngle(360.0);
+        setAngle(2 * M_PI);
     }
 }
 
-void Player::moveForward(float delta, int window_width, int window_height, int forward )
+void Player::moveForward(float delta, int windowWidth, int windowHeight, int forward )
 {
     Vector2 turnvect;
-    //Vector2 b;
-    Vector2 move_position;
-    turnvect = Vector2::makeRotation(mRadMoving);
+    Vector2 b;
+    Vector2 movePosition;
+    turnvect = Vector2::makeRotation(mAngleMoving);
 
-   /* b.x = -turnvect.y * m_position.y / turnvect.x;
-    b.y = m_position.y;
+  /*  b.x = -turnvect.y * mPosition.y / turnvect.x;
+    b.y = mPosition.y;
     b = b.normalized();*/
 
     switch (forward)
     {
     case 1:
-        move_position = mPosition + turnvect * mSpeed * delta;
+        movePosition = mPosition + turnvect * mSpeed * delta;
         break;
     case 2:
-        move_position = mPosition - turnvect * mSpeed * delta;
+        movePosition = mPosition - turnvect * mSpeed * delta;
         break;
     case 3:
-      //  move_position = m_position - b * SPEED * delta;
+      //  movePosition = mPosition - b * mSpeed * delta;
         break;
     case 4:
-    //    move_position = m_position + b * SPEED * delta;
+     //   movePosition = mPosition + b * mSpeed * delta;
         break;
     }
 
-    move_position = isInsideWindow(move_position, window_width, window_height);
-    setPosition(move_position);
+    movePosition = isInsideWindow(movePosition, windowWidth, windowHeight);
+    setPosition(movePosition);
 }
 
-void Player::speedUp(float delta, int window_width, int window_height)
+void Player::goRight(float delta, int windowWidth, int windowHeight)
 {
     setSpeed(mSpeed + mAcceleration);
     setForward(true);
-    mRadMoving = radians();
-    moveForward(delta, window_width, window_height, 1);
+    mAngleMoving = mAngle;
+    moveForward(delta, windowWidth, windowHeight, 4);
 }
 
-void Player::speedDown(float delta, int window_width, int window_height)
+void Player::goLeft(float delta, int windowWidth, int windowHeight)
+{
+    setSpeed(mSpeed + mAcceleration);
+    setForward(true);
+    mAngleMoving = mAngle;
+    moveForward(delta, windowWidth, windowHeight, 3);
+}
+
+void Player::speedUp(float delta, int windowWidth, int windowHeight)
+{
+    setSpeed(mSpeed + mAcceleration);
+    setForward(true);
+    mAngleMoving = mAngle;;
+    moveForward(delta, windowWidth, windowHeight, 1);
+}
+
+void Player::speedDown(float delta, int windowWidth, int windowHeight)
 {
     if (mIsForward)
     {
         setSpeed(mSpeed - mAcceleration);
-        mRadMoving = radians();
-        moveForward(delta, window_width, window_height, 1);
+        mAngleMoving = mAngle;
+        moveForward(delta, windowWidth, windowHeight, 1);
     }
     if (mSpeed <= 100)
     {
         setForward(false);
-        mRadMoving = radians();
-        moveForward(delta, window_width, window_height, 2);
+        mAngleMoving = mAngle;
+        moveForward(delta, windowWidth, windowHeight, 2);
     }
 }
 
-Vector2 Player::isInsideWindow(Vector2 position, int window_width, int window_height)
+Vector2 Player::isInsideWindow(Vector2 position, int windowWidth, int windowHeight)
 {
     Vector2 result;
-    float max_x = window_width - mImage->width();
+    float maxX = windowWidth - mImage->width();
     if (position.x < 0)
-        result.x = max_x;
-    else if (position.x >= max_x)
+        result.x = maxX;
+    else if (position.x >= maxX)
         result.x = 0;
     else
         result.x = position.x;
 
-    float max_y = window_height - mImage->height();
+    float maxY = windowHeight - mImage->height();
 
     if (position.y < 0)
-        result.y = max_y;
-    else if (position.y >= max_y)
+        result.y = maxY;
+    else if (position.y >= maxY)
         result.y = 0;
     else
         result.y = position.y;
@@ -128,22 +141,22 @@ Vector2 Player::isInsideWindow(Vector2 position, int window_width, int window_he
     return result;
 }
 
-void Player::rotateToMouse(const Vector2& point)
+void Player::rotateToMouse(Vector2 point)
 {
     Vector2 mouse;
     mouse = point - center();
     mouse = mouse.normalized();
-    Vector2 direct_pos = Vector2::makeRotation(radians());
+    Vector2 directPos = Vector2::makeRotation(mAngle);
 
-    float ang = Vector2::angle(direct_pos, mouse);
+    float angle = Vector2::angle(directPos, mouse);
 
-    bool res = mouse.isLeft(direct_pos);
+    bool res = mouse.isLeft(directPos);
     if (res)
     {
-        changeAngleTo(ang);
+        changeAngleTo(angle);
     }
     else
     {
-        changeAngleTo(-ang);
+        changeAngleTo(-angle);
     }
 }

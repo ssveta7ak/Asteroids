@@ -19,9 +19,9 @@ public:
     void drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect);
     SDL_Texture* getTexture() const;
     void render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip = SDL_FLIP_NONE,
-                double angle = 0.0, SDL_Point* center = NULL);
+                float angle = 0.0, SDL_Point* center = NULL);
     //Creates image from font string
-    bool createFromRenderedText(std::string textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer);
+    bool createFromRenderedText(const char* textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer);
 
 private:
     SDL_Surface* mImage = nullptr;

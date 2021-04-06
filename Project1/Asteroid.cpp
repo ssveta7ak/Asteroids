@@ -1,39 +1,41 @@
 #include "Asteroid.h"
 
-Asteroid::Asteroid()
-{}
-
 Asteroid::~Asteroid()
 {
     mImage.reset();
 }
 
-void Asteroid::init(SDL_Renderer* renderer)
-
+void Asteroid::init(SDL_Renderer* renderer, bool big, int width, int height)
 {
     const char* path = "assets/asteroid.png";
+    const char* path2 = "assets/small_asteroid.png";
     mImage = std::make_unique<Image>();
-    mImage->createTexture(path, renderer);
-    mRadians = randomFloat(0.0, 2 * M_PI);
-    mActive = true; 
-    float  a = randomFloat(0.0, 800.0);
-    float  b = randomFloat(0.0, 600.0);
-    mPosition = Vector2(a, b);
-    mSpeed = 20;
+    if (big)
+    {
+        mImage->createTexture(path, renderer);
+        mActive = true;
+        mSpeed = 20;
+        float  a = randomFloat(0.0, width);
+        float  b = randomFloat(0.0, height);
+        mPosition = Vector2(a, b);
+    }
+    else
+    {
+        mImage->createTexture(path2, renderer);
+        mActive = false;
+        mSpeed = 40;
+        mPosition = Vector2(-50, -50);
+    }
+    
+    mAngle = randomFloat(0.0, 2 * M_PI);
     mRadius = radius();
 }
 
-float Asteroid::randomFloat(float a, float b) {
-    float random = ((float)rand()) / (float)RAND_MAX;
-    float diff = b - a;
-    float r = random * diff;
-    return a + r;
-}
 
-Vector2 Asteroid::isInsideWindow(Vector2 position, int window_width, int window_height)
+Vector2 Asteroid::isInsideWindow(Vector2 position, int windowWidth, int windowHeight)
 {
     Vector2 result;
-    float max_x = window_width;
+    float max_x = windowWidth;
     if (position.x < -mImage->width())
         result.x = max_x;
     else if (position.x >= max_x)
@@ -41,7 +43,7 @@ Vector2 Asteroid::isInsideWindow(Vector2 position, int window_width, int window_
     else
         result.x = position.x;
 
-    float max_y = window_height;
+    float max_y = windowHeight;
 
     if (position.y < -mImage->height())
         result.y = max_y;
@@ -53,12 +55,14 @@ Vector2 Asteroid::isInsideWindow(Vector2 position, int window_width, int window_
     return result;
 }
 
-void Asteroid::update(float delta, int window_width, int window_height)
+void Asteroid::update(float delta, int windowWidth, int windowHeight)
 {
     Vector2 position;
-    Vector2 turnvect = Vector2::makeRotation(mRadians);
+    Vector2 turnvect = Vector2::makeRotation(mAngle);
     position = mPosition + turnvect * mSpeed * delta;
 
-    position = isInsideWindow(position, window_width, window_height);
+    position = isInsideWindow(position, windowWidth, windowHeight);
     setPosition(position);
 }
+void Asteroid::init(SDL_Renderer* renderer)
+{}

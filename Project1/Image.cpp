@@ -51,7 +51,7 @@ void Image::drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect)
     SDL_RenderPresent(renderer);
 }
 
-void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip, double angle, SDL_Point* center)
+void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip /*= SDL_FLIP_NONE*/, float angle, SDL_Point* center)
 {
     SDL_Rect src_rect;
     src_rect.w = mWidth;
@@ -63,7 +63,7 @@ void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_Render
     int res = SDL_RenderCopyEx(renderer, mTexture, &src_rect, &dest_rect, angle, center, flip);
 }
 
-bool Image::createFromRenderedText(std::string textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer)
+bool Image::createFromRenderedText(const char* textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer)
 {
     //Globally used font
     TTF_Font* gFont = TTF_OpenFont("assets/Lexend/Lexend-SemiBold.ttf", textSize);
@@ -74,7 +74,7 @@ bool Image::createFromRenderedText(std::string textureText, SDL_Color textColor,
     }
     else
     {
-        mImage = TTF_RenderText_Solid(gFont, textureText.c_str(), textColor);
+        mImage = TTF_RenderText_Solid(gFont, textureText, textColor);
         if (!mImage)
         {
             printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());

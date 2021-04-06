@@ -1,27 +1,21 @@
 #pragma once
 
-#include "SDL_mixer.h"
-#include "SDL.h"
-#include "SDL_image.h"
 #include <chrono>
-#include <iostream>
 #include <memory>
-#include <cmath>
-#include <windows.h>
-#include <sstream>
-#include <array>
 #include "Player.h"
 #include "Bullet.h"
 #include "Vector2.h"
 #include "BulletManager.h"
 #include "AsteroidManager.h"
-#include "SmallAsteroid.h"
-#include "SmallAsteroidManager.h"
+#include "SoundManager.h"
+#include "CollisionManager.h"
+#include "AnimationManager.h"
 #include "Animation.h"
-#include <math.h> 
+#include "Listener.h"
+#include "UIManager.h"
 
-
-class Game {
+class Game : public PlayerKilledListner
+{
 public:
     Game();
     ~Game();
@@ -30,41 +24,45 @@ public:
     void handleEvents();
     void update();
     void render();
+    void qiut() { isRunning = false; }
+
     bool running() const { return isRunning; }
     float getDelta()const { return mDelta; }
+
     void initBullets();
     void initAsteroids();
     void initPlayer();
     void initAnimation();
-    bool initText();
-    bool initSound();
     void initWindow(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+
     void fireBullet();
-    void updateCrossing();
-    void animate();
     void deletePlayer();
     void newGame();
+
+    virtual void onPlayerKilled(const Asteroid& asteroid) override;
 
 private:
     bool isRunning = false;
     bool mGameFail = false;
     bool mGameWin = false;
+    bool mIsCrossed = false;
+
     float mDelta = 0;
-    int frame = 0;
     SDL_Window* mWindow = nullptr;
     int mWindowWidth;
     int mWindowHeight;
     SDL_Renderer* mRenderer = nullptr;
     std::unique_ptr<Player> mPlayer;
+
     BulletManager mBullets;
-    Asteroidmanager mAsteroids;
-    SmallAsteroidManager mSmallAsteroids;
-    Animation mAnimation;
-    std::unique_ptr<Image> mGameOverText;
-    std::unique_ptr<Image> mInstruction;
-    std::unique_ptr<Image> mInstruction2;
-    std::unique_ptr<Image> mWinText;
-    std::chrono::time_point<std::chrono::system_clock> mLastTime = std::chrono::system_clock::now();
-    Mix_Music* mShot = nullptr;
-    Mix_Music* mExplosion = nullptr;
+    AsteroidManager mAsteroids;
+    AsteroidManager mSmallAsteroids;
+    AnimationManager mAnimation;
+    SoundManager mSound;
+    CollisionManager mCollisions;
+    UIManager mText;
+
+    using time_point = std::chrono::time_point<std::chrono::system_clock>;
+    time_point mLastTime;
+    time_point mLastTimeBulletSpawn;
 };

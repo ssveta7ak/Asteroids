@@ -1,10 +1,8 @@
 #pragma once
 
-#include "SDL.h"
-#include "SDL_image.h"
 #include "Image.h"
-#include <array>
 #include "Vector2.h"
+#include <array>
 #include <iostream>
 
 class Animation

@@ -1,21 +1,27 @@
 #pragma once
 
 #include <array>
+#include <vector>
 #include "Bullet.h"
+#include "Listener.h"
 
-class BulletManager
+class BulletManager final
 {
 public:
-    BulletManager();
-    ~BulletManager();
 
     void init(SDL_Renderer* renderer);
-    int size() { return mBullets.size(); }
-    std::unique_ptr<Bullet>& operator[] (const int index);
     void render(SDL_Renderer* renderer);
-    void updateFireBullet(int window_width, int window_height, float delta);
+    void updateFireBullet(int windowWidth, int windowHeight, float delta);
+    int size() const { return static_cast<int>(mBullets.size()); }
+    Bullet* spawnBullet();
+
+    std::unique_ptr<Bullet>& operator[] (const int index);
+    std::array<std::unique_ptr<Bullet>, 100>::iterator begin() { return mBullets.begin(); }
+    std::array<std::unique_ptr<Bullet>, 100>::iterator end() { return mBullets.end(); }
+    
+    void addListener(BulletSpawnListener* listener) { mBulletSpawnListener.push_back(listener); }
 
 private:
-    std::unique_ptr<Bullet> mBullet;
-    std::array<std::unique_ptr<Bullet>, 20> mBullets;
+    std::array<std::unique_ptr<Bullet>, 100> mBullets;
+    std::vector<BulletSpawnListener*> mBulletSpawnListener;
 };

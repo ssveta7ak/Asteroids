@@ -1,46 +1,46 @@
 #include "AsteroidManager.h"
 
-Asteroidmanager::Asteroidmanager()
-{}
-
-Asteroidmanager::~Asteroidmanager()
-{}
-
-void Asteroidmanager::init(SDL_Renderer* renderer)
+void AsteroidManager::init(SDL_Renderer* renderer, bool isBig, int count, int width, int height)
 {
-    for (int i = 0; i < mAsteroids.size(); ++i)
+    for (int i = 0; i < count; ++i)
     {
-        mAsteroid = std::make_unique<Asteroid>();
-        mAsteroid->init(renderer);
-        mAsteroids.at(i) = std::move(mAsteroid);
+        Asteroid asteroid;
+        asteroid.init(renderer, isBig, width, height);
+        mAsteroids.push_back(std::move(asteroid));
     }
-    mActiveCount = mAsteroids.size();
+    if (isBig)
+    {
+        mActiveCount = static_cast<int>(mAsteroids.size());
+    }
+    else
+    {
+        mActiveCount = 0;
+    }
 }
 
-std::unique_ptr<Asteroid>& Asteroidmanager::operator[] (const int index)
+Asteroid& AsteroidManager::operator[] (int index)
 {
     return mAsteroids[index];
 }
 
-void Asteroidmanager::render(SDL_Renderer* renderer)
+void AsteroidManager::render(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < mAsteroids.size(); ++i)
+    for (const Asteroid& asteroid : mAsteroids)
     {
-        if (mAsteroids[i]->isActive())
+        if (asteroid.isActive())
         {
-            mAsteroids[i]->render(renderer);
+            asteroid.render(renderer);
         }
     }
 }
 
-void Asteroidmanager::update(int window_width, int window_height, float delta)
+void AsteroidManager::update(int windowWidth, int windowHeight, float delta)
 {
-    for (int i = 0; i < mAsteroids.size(); ++i)
+    for (Asteroid& asteroid : mAsteroids)
     {
-        if (mAsteroids[i]->isActive())
+        if (asteroid.isActive())
         {
-            mAsteroids[i]->update(delta, window_width, window_height);
+            asteroid.update(delta, windowWidth, windowHeight);
         }
     }
-
 }

@@ -1,18 +1,13 @@
 #include "BulletManager.h"
-
-BulletManager::BulletManager()
-{}
-
-BulletManager::~BulletManager()
-{}
+#include <algorithm> 
 
 void BulletManager::init(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < mBullets.size(); ++i)
+    for (std::unique_ptr<Bullet>& bullet : mBullets)
     {
-        mBullet = std::make_unique<Bullet>();
-        mBullet->init(renderer);
-        mBullets.at(i) = std::move(mBullet);
+        std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
+        newBullet->init(renderer);
+        bullet = std::move(newBullet);
     }
 }
 
@@ -23,23 +18,23 @@ std::unique_ptr<Bullet>& BulletManager::operator[] (const int index)
 
 void BulletManager::render(SDL_Renderer* renderer)
 {
-    for (int i = 0; i < mBullets.size(); ++i)
+    for (std::unique_ptr<Bullet>& bullet : mBullets)
     {
-        if (mBullets[i]->isActive())
+        if (bullet->isActive())
         {
-            mBullets[i]->render(renderer);
+            bullet->render(renderer);
         }
     }
 }
 
-void BulletManager::updateFireBullet(int window_width, int window_height, float delta)
+void BulletManager::updateFireBullet(int windowWidth, int windowHeight, float delta)
 {
-    for (auto& bullet : mBullets)
+    for (std::unique_ptr<Bullet>& bullet : mBullets)
     {
         if (bullet->isActive())
         {
             bullet->update(delta);
-            bool isInWindow = bullet->isInsideWindow(window_width, window_height);
+            bool isInWindow = bullet->isInsideWindow(windowWidth, windowHeight);
             if (!isInWindow)
             {
                 bullet->setActive(false);
@@ -47,4 +42,32 @@ void BulletManager::updateFireBullet(int window_width, int window_height, float 
             }
         }
     }
+}
+
+Bullet* BulletManager::spawnBullet()
+{
+    auto it = std::find_if(mBullets.begin(), mBullets.end(),
+        [](const std::unique_ptr<Bullet>& bullet) -> bool
+        {
+            return !bullet->isActive();
+        }
+    );
+
+    if (it != mBullets.end())
+    {
+        Bullet* bullet = it->get();
+        bullet->setActive(true);
+
+        if (!mBulletSpawnListener.empty())
+        {
+            for (auto listener : mBulletSpawnListener)
+            {
+                listener->onBulletSpawn();
+            }
+        }
+
+        return bullet;
+    }
+    
+    return nullptr;
 }

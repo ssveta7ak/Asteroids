@@ -1,12 +1,6 @@
 #include "Object.h"
 
-Object::Object()
-{}
-
-Object::~Object()
-{}
-
-void Object::render(SDL_Renderer* renderer)
+void Object::render(SDL_Renderer* renderer) const
 {
     SDL_Rect dest_rect;
     dest_rect.w = mImage->width();
@@ -17,17 +11,17 @@ void Object::render(SDL_Renderer* renderer)
     mImage->render(renderer, dest_rect);
 }
 
-bool Object::isInsideWindow(int window_width, int window_height)
+bool Object::isInsideWindow(int windowWidth, int windowHeight)
 {
-    int max_x = window_width - mImage->width();
-    int max_y = window_height - mImage->height();
+    int max_x = windowWidth - mImage->width();
+    int max_y = windowHeight - mImage->height();
     if (mPosition.x >= 0 && mPosition.x <= max_x && mPosition.y >= 0 && mPosition.y <= max_y)
         return true;
     else
         return false;
 }
 
-void Object::setPosition(const Vector2& position)
+void Object::setPosition(Vector2 position)
 {
     mPosition.x = position.x;
     mPosition.y = position.y;
@@ -36,7 +30,7 @@ void Object::setPosition(const Vector2& position)
 void Object::update(float delta)
 {
     Vector2 position;
-    Vector2 turnvect = Vector2::makeRotation(mRadians);
+    Vector2 turnvect = Vector2::makeRotation(mAngle);
     position = mPosition + turnvect * mSpeed * delta;
     setPosition(position);
 }
@@ -72,4 +66,19 @@ void Object::reset()
 {
     mActive = false;
     mPosition = Vector2(-100, -100);
+}
+
+float Object::randomFloat(float a, float b) {
+    float random = ((float)rand()) / (float)RAND_MAX;
+    float diff = b - a;
+    float r = random * diff;
+    return a + r;
+}
+
+void Object::setSpeed(float value)
+{
+    if (value < MAX_SPEED)
+    {
+        mSpeed = value;
+    }
 }
