@@ -1,3 +1,5 @@
 .vs/
 x64/
-Project1/x64
+Game/x64
+Game/Debug
+Game/Release
