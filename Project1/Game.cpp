@@ -2,15 +2,17 @@
 
 Game::Game()
 {
+    // Initialize time members
     mLastTime = std::chrono::system_clock::now();
     mLastTimeBulletSpawn = std::chrono::system_clock::now();
 }
 
 Game::~Game()
 {
+    // Free resources
     mPlayer.reset();
 
-    for (std::unique_ptr<Bullet>& bullet: mBullets)
+    for (std::unique_ptr<Bullet> &bullet : mBullets)
     {
         bullet.reset();
     }
@@ -29,32 +31,33 @@ Game::~Game()
     TTF_Quit();
     Mix_Quit();
     SDL_Quit();
-    std::cout << "Game cleaned" << std::endl;
 }
 
 void Game::initBullets()
 {
+    // Create and init bullets
     mBullets.init(mRenderer);
 }
 
 void Game::initAsteroids()
 {
+    // Create and init asteroids inside game window
     mAsteroids.init(mRenderer, true, 10, mWindowWidth, mWindowHeight);
     mSmallAsteroids.init(mRenderer, false, 30, mWindowWidth, mWindowHeight);
 }
 
-void Game::initAnimation()
-{
-    mAnimation.init(mRenderer);
-}
+void Game::initAnimation() { mAnimation.init(mRenderer); }
 
-void Game::initWindow(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
+void Game::initWindow(const char *title, int xpos, int ypos, int width,
+                      int height, bool fullscreen)
 {
     int flags = 0;
     if (fullscreen)
     {
         flags = SDL_WINDOW_FULLSCREEN;
     }
+
+    // Create window with custom dimensions
     if (SDL_Init(SDL_INIT_EVERYTHING) == 0)
     {
         mWindow = SDL_CreateWindow(title, xpos, ypos, width, height, flags);
@@ -67,33 +70,42 @@ void Game::initWindow(const char* title, int xpos, int ypos, int width, int heig
     }
     else
     {
+        // Exit the game if window won't create
         isRunning = false;
     }
     SDL_GetWindowSize(mWindow, &mWindowWidth, &mWindowHeight);
 
+    // Initialize  SDL_TTF for using TrueType fonts, exit the game if it won't
+    // be created
     if (TTF_Init() == -1)
     {
-        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n", TTF_GetError());
+        printf("SDL_ttf could not initialize! SDL_ttf Error: %s\n",
+               TTF_GetError());
         isRunning = false;
     }
-    //Initialize SDL_mixer
+    // Initialize SDL_mixer for using sound effects, exit the game if it won't
+    // be created
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0)
     {
-        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError());
+        printf("SDL_mixer could not initialize! SDL_mixer Error: %s\n",
+               Mix_GetError());
         isRunning = false;
     }
 }
 
 void Game::initPlayer()
 {
+    // Create and initialize player
     mPlayer = std::make_unique<Player>();
     mPlayer->init(mRenderer);
     mPlayer->setPosition(Vector2(1, 1));
 }
 
-void Game::init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen)
+void Game::init(const char *title)
 {
-    initWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, fullscreen);
+    settings.init("assets/settings/settings.json");
+    initWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+               settings.width(), settings.height(), settings.fullscreen());
     initPlayer();
     initBullets();
     initAsteroids();
@@ -101,13 +113,13 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     mText.init(mRenderer);
     mSound.init();
 
+    // Add event listeners
     mBullets.addListener(&mSound);
-    mCollisions.addListener((AsteroidDestroyedListener*)&mSound);
-    mCollisions.addListener((AsteroidDestroyedListener*)&mAnimation);
+    mCollisions.addListener((AsteroidDestroyedListener *)&mSound);
+    mCollisions.addListener((AsteroidDestroyedListener *)&mAnimation);
     mCollisions.addListener(this);
-    mCollisions.addListener((PlayerKilledListner*)&mSound);
-    mCollisions.addListener((PlayerKilledListner*)&mAnimation);
-    
+    mCollisions.addListener((PlayerKilledListner *)&mSound);
+    mCollisions.addListener((PlayerKilledListner *)&mAnimation);
 }
 
 void Game::handleEvents()
@@ -117,192 +129,73 @@ void Game::handleEvents()
     duration<float> fs = timeNow - mLastTime;
     mDelta = fs.count();
     mLastTime = timeNow;
-    float angle = 6.0;
-    const float calmDown = 200.0;
+    float angle = 6.0;            // Delta angle (in degrees) of rotation
+    const float calmDown = 200.0; // Timeout between bullets spawn
     int mouseX;
     int mouseY;
-    if (mGameWin)
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event) != 0)
     {
-        SDL_Event event;
-        SDL_PollEvent(&event);
-        switch (event.type)
+        const uint8_t *currentKeyStates = SDL_GetKeyboardState(nullptr);
+        if (mPlayer)
         {
-        case SDL_QUIT:
-            isRunning = false;
-            break;
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
+            if (currentKeyStates[SDL_SCANCODE_LEFT])
             {
-            case SDLK_ESCAPE:
-                isRunning = false;
-                break;
-            case SDLK_RETURN:
+                mPlayer->changeAngleTo(-angle);
+            }
+            if (currentKeyStates[SDL_SCANCODE_RIGHT])
+            {
+                mPlayer->changeAngleTo(angle);
+            }
+            if (currentKeyStates[SDL_SCANCODE_UP])
+            {
+                mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
+            }
+            if (currentKeyStates[SDL_SCANCODE_DOWN])
+            {
+                mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
+            }
+            if (currentKeyStates[SDL_SCANCODE_SPACE])
+            {
+                auto currentTime = system_clock::now();
+                duration<float, std::milli> f =
+                        currentTime - mLastTimeBulletSpawn;
+                if (f.count() >= calmDown)
+                {
+                    mLastTimeBulletSpawn = currentTime;
+                    fireBullet();
+                }
+            }
+            if (event.type == SDL_MOUSEBUTTONDOWN)
+            {
+                SDL_GetMouseState(&mouseX, &mouseY);
+                mPlayer->rotateToMouse(Vector2(mouseX, mouseY));
+            }
+        }
+        if (event.type == SDL_QUIT)
+        {
+            isRunning = false;
+        }
+        if (currentKeyStates[SDL_SCANCODE_ESCAPE])
+        {
+            isRunning = false;
+        }
+        if (currentKeyStates[SDL_SCANCODE_RETURN])
+        {
+            if (mGameWin)
+            {
                 isRunning = true;
                 newGame();
                 break;
             }
-            break;
-        default:
-            break;
-        }
-    }
-    else if (mPlayer)
-    {
-        SDL_Event event;
-        
-        while (SDL_PollEvent(&event) != 0 )
-        {
-            const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-            if (currentKeyStates[SDL_SCANCODE_RIGHT] && currentKeyStates[SDL_SCANCODE_SPACE])
+            else if (mGameFail)
             {
-                mPlayer->changeAngleTo(angle);
-
-                auto currentTime = system_clock::now();
-                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
-                if (f.count() >= calmDown)
-                {
-                    mLastTimeBulletSpawn = currentTime;
-                    fireBullet();
-                }
-            }
-            else if (currentKeyStates[SDL_SCANCODE_LEFT] && currentKeyStates[SDL_SCANCODE_SPACE])
-            {
-                 mPlayer->changeAngleTo(-angle);
-
-                 auto currentTime = system_clock::now();
-                 duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
-                 if (f.count() >= calmDown)
-                 {
-                     mLastTimeBulletSpawn = currentTime;
-                     fireBullet();
-                 }
-            }
-            else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_SPACE])
-            {
-                mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
-
-                auto currentTime = system_clock::now();
-                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
-                if (f.count() >= calmDown)
-                {
-                    mLastTimeBulletSpawn = currentTime;
-                    fireBullet();
-                }
-            }
-            else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_SPACE])
-            {
-                mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
-
-                auto currentTime = system_clock::now();
-                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
-                if (f.count() >= calmDown)
-                {
-                    mLastTimeBulletSpawn = currentTime;
-                    fireBullet();
-                }
-            }
-            else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_LEFT])
-            {
-                 mPlayer->changeAngleTo(-angle);
-                 mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_DOWN] && currentKeyStates[SDL_SCANCODE_RIGHT])
-            {
-                 mPlayer->changeAngleTo(angle);
-                 mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_LEFT])
-            {
-                 mPlayer->changeAngleTo(-angle);
-                 mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_UP] && currentKeyStates[SDL_SCANCODE_RIGHT])
-            {
-                 mPlayer->changeAngleTo(angle);
-                 mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_LEFT])
-            {
-                mPlayer->changeAngleTo(-angle);
-              //  mPlayer->goRight(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_RIGHT])
-            {
-                mPlayer->changeAngleTo(angle);
-              //  mPlayer->goLeft(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_UP])
-            {
-                mPlayer->speedUp(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_DOWN])
-            {
-                mPlayer->speedDown(mDelta, mWindowWidth, mWindowHeight);
-            }
-            else if (currentKeyStates[SDL_SCANCODE_SPACE])
-            {
-                auto currentTime = system_clock::now();
-                duration<float, std::milli> f = currentTime - mLastTimeBulletSpawn;
-                if (f.count() >= calmDown)
-                {
-                    mLastTimeBulletSpawn = currentTime;
-                    fireBullet();
-                }
-                
-            }
-            else if (currentKeyStates[SDL_SCANCODE_ESCAPE])
-            {
-                isRunning = false;
-            }
-
-            switch (event.type)
-            {
-            case SDL_QUIT:
-                isRunning = false;
-                break;
-            
-            case SDL_MOUSEMOTION:
-                /* mouse.x = event.motion.x;
-                 mouse.y = event.motion.y;
-                 mouse_vec = mouse - m_player->get_center();
-                 direct_pos = Vector2::make_rotation(m_player->radians());
-                 ang = Vector2::angle(mouse_vec, direct_pos);
-                 m_player->change_angle_to(ang);*/
-                break;
-            case SDL_MOUSEBUTTONDOWN:
-                SDL_GetMouseState(&mouseX, &mouseY);
-                mPlayer->rotateToMouse(Vector2(mouseX, mouseY));
-                break;
-
-            default:
-                break;
-            }
-        }
-    }
-    else // Game fail
-    {
-        SDL_Event event;
-        SDL_PollEvent(&event);
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            isRunning = false;
-            break;
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_ESCAPE:
-                isRunning = false;
-                break;
-            case SDLK_RETURN:
                 isRunning = true;
                 mGameFail = false;
                 initPlayer();
                 break;
             }
-            break;
-        default:
-            break;
         }
     }
 }
@@ -311,8 +204,11 @@ void Game::update()
 {
     if (mSmallAsteroids.activeCount() == 0 && mAsteroids.activeCount() == 0)
     {
+        // Game won when all asteroids are destroyed
         mGameWin = true;
-        for (std::unique_ptr<Bullet>& bullet: mBullets)
+
+        // Set all bullets inactive
+        for (std::unique_ptr<Bullet> &bullet : mBullets)
         {
             bullet->setActive(false);
         }
@@ -331,78 +227,89 @@ void Game::update()
         {
             mPlayer->moveForward(mDelta, mWindowWidth, mWindowHeight, 2);
         }
+        // Check objects collisions
         mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
     }
 }
 
-void Game::render()
-{ 
-    SDL_RenderClear(mRenderer);
-    
-    mBullets.render(mRenderer);
-    mAsteroids.render(mRenderer);
-    mSmallAsteroids.render(mRenderer);
-    mAnimation.animate();
-    
+void Game::renderText()
+{
     if (mGameFail)
     {
+        // Render text in the center of game window.
+        // Calculate coordinates (x1, y1) of the window center
         int x1 = mWindowWidth / 2 - mText.GameOverText()->width() / 2;
         int y1 = mWindowHeight / 2 - mText.GameOverText()->height();
         mText.render(mRenderer, mText.GameOverText(), x1, y1);
 
+        // Render text in the bottom of the window
         int x2 = mWindowWidth / 2 - mText.Instruction2()->width() / 2;
         int y2 = mWindowHeight - mText.Instruction2()->height();
         mText.render(mRenderer, mText.Instruction2(), x2, y2);
     }
     else if (mGameWin)
     {
+        // Render text in the center of game window
+        // Calculate coordinates (x1, y1) of the window center
         int x1 = mWindowWidth / 2 - mText.WinText()->width() / 2;
         int y1 = (mWindowHeight / 2) - mText.WinText()->height();
         mText.render(mRenderer, mText.WinText(), x1, y1);
 
+        // Render text in the bottom of the window
         int x2 = mWindowWidth / 2 - mText.Instruction()->width() / 2;
         int y2 = mWindowHeight - mText.Instruction()->height();
         mText.render(mRenderer, mText.Instruction(), x2, y2);
-
     }
-    else if (mPlayer)
+}
+
+void Game::render()
+{
+    SDL_RenderClear(mRenderer);
+
+    mBullets.render(mRenderer);
+    mAsteroids.render(mRenderer);
+    mSmallAsteroids.render(mRenderer);
+    mAnimation.animate();
+    renderText();
+    if (mPlayer && !mGameWin)
     {
         mPlayer->render(mRenderer);
     }
-    
+
     SDL_RenderPresent(mRenderer);
 }
 
 void Game::fireBullet()
 {
-    Bullet* bullet = mBullets.spawnBullet();
+    // Set active bullet. Position and angle are taken from Player.
+    Bullet *bullet = mBullets.spawnBullet();
     bullet->setPosition(mPlayer->center());
     bullet->setAngle(mPlayer->angle());
 }
 
-void Game::deletePlayer()
-{
-    mPlayer.reset();
-}
+void Game::deletePlayer() { mPlayer.reset(); }
 
 void Game::newGame()
 {
     mGameWin = false;
     mGameFail = false;
     initPlayer();
-    for ( Asteroid& asteroid : mAsteroids)
+
+    // Activate all asteroids, set random positions inside the window
+    for (Asteroid &asteroid : mAsteroids)
     {
         asteroid.setActive(true);
         asteroid.setAngle(Asteroid::randomFloat(0.0, 2 * M_PI));
-        float  a = Object::randomFloat(0.0, mWindowWidth);
-        float  b = Object::randomFloat(0.0, mWindowHeight);
+        float a = Object::randomFloat(0.0, mWindowWidth);
+        float b = Object::randomFloat(0.0, mWindowHeight);
         asteroid.setPosition(Vector2(a, b));
     }
     mAsteroids.setActiveCount(mAsteroids.size());
     mSmallAsteroids.setActiveCount(0);
 }
 
-void Game::onPlayerKilled(const Asteroid& asteroid)
+// Delete player when objects collision is happened
+void Game::onPlayerKilled(const Asteroid &asteroid)
 {
     deletePlayer();
     mGameFail = true;

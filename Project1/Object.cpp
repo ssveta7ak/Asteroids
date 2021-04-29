@@ -1,6 +1,6 @@
 #include "Object.h"
 
-void Object::render(SDL_Renderer* renderer) const
+void Object::render(SDL_Renderer *renderer) const
 {
     SDL_Rect dest_rect;
     dest_rect.w = mImage->width();
@@ -11,11 +11,13 @@ void Object::render(SDL_Renderer* renderer) const
     mImage->render(renderer, dest_rect);
 }
 
+// Check object position inside the window
 bool Object::isInsideWindow(int windowWidth, int windowHeight)
 {
     int max_x = windowWidth - mImage->width();
     int max_y = windowHeight - mImage->height();
-    if (mPosition.x >= 0 && mPosition.x <= max_x && mPosition.y >= 0 && mPosition.y <= max_y)
+    if (mPosition.x >= 0 && mPosition.x <= max_x && mPosition.y >= 0 &&
+        mPosition.y <= max_y)
         return true;
     else
         return false;
@@ -27,6 +29,7 @@ void Object::setPosition(Vector2 position)
     mPosition.y = position.y;
 }
 
+// Update object position
 void Object::update(float delta)
 {
     Vector2 position;
@@ -35,7 +38,7 @@ void Object::update(float delta)
     setPosition(position);
 }
 
-Vector2 Object::center() const
+Vector2 Object::center() const // Get object center position
 {
     Vector2 center;
     center.x = mPosition.x + mImage->width() / 2;
@@ -53,7 +56,8 @@ float Object::radius() const
         return w / 2.0;
 }
 
-bool Object::iscrossed(const Object& A, const Object& B)
+// Check collision of two objects.
+bool Object::iscrossed(const Object &A, const Object &B)
 {
     float dist = Vector2::distance(A.center(), B.center());
     if (dist <= (A.mRadius + B.mRadius))
@@ -68,7 +72,9 @@ void Object::reset()
     mPosition = Vector2(-100, -100);
 }
 
-float Object::randomFloat(float a, float b) {
+// Get random float between (a, b)
+float Object::randomFloat(float a, float b)
+{
     float random = ((float)rand()) / (float)RAND_MAX;
     float diff = b - a;
     float r = random * diff;
@@ -77,8 +83,6 @@ float Object::randomFloat(float a, float b) {
 
 void Object::setSpeed(float value)
 {
-    if (value < MAX_SPEED)
-    {
-        mSpeed = value;
-    }
+    const float MAX_SPEED = 150;
+    mSpeed = (value < MAX_SPEED) ? value : MAX_SPEED;
 }

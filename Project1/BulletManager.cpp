@@ -1,9 +1,10 @@
 #include "BulletManager.h"
-#include <algorithm> 
+#include <algorithm>
 
-void BulletManager::init(SDL_Renderer* renderer)
+void BulletManager::init(
+        SDL_Renderer *renderer) // Create and initialize bullets
 {
-    for (std::unique_ptr<Bullet>& bullet : mBullets)
+    for (std::unique_ptr<Bullet> &bullet : mBullets)
     {
         std::unique_ptr<Bullet> newBullet = std::make_unique<Bullet>();
         newBullet->init(renderer);
@@ -11,14 +12,14 @@ void BulletManager::init(SDL_Renderer* renderer)
     }
 }
 
-std::unique_ptr<Bullet>& BulletManager::operator[] (const int index)
+std::unique_ptr<Bullet> &BulletManager::operator[](const int index)
 {
     return mBullets[index];
 }
 
-void BulletManager::render(SDL_Renderer* renderer)
+void BulletManager::render(SDL_Renderer *renderer) // Render active bullets
 {
-    for (std::unique_ptr<Bullet>& bullet : mBullets)
+    for (std::unique_ptr<Bullet> &bullet : mBullets)
     {
         if (bullet->isActive())
         {
@@ -27,9 +28,12 @@ void BulletManager::render(SDL_Renderer* renderer)
     }
 }
 
-void BulletManager::updateFireBullet(int windowWidth, int windowHeight, float delta)
+// Update position of active bullet. Set bullet as inactive when it goes outside
+// the window.
+void BulletManager::updateFireBullet(int windowWidth, int windowHeight,
+                                     float delta)
 {
-    for (std::unique_ptr<Bullet>& bullet : mBullets)
+    for (std::unique_ptr<Bullet> &bullet : mBullets)
     {
         if (bullet->isActive())
         {
@@ -44,30 +48,27 @@ void BulletManager::updateFireBullet(int windowWidth, int windowHeight, float de
     }
 }
 
-Bullet* BulletManager::spawnBullet()
+Bullet *BulletManager::spawnBullet()
 {
+    // Find the first inactive bullet in array
     auto it = std::find_if(mBullets.begin(), mBullets.end(),
-        [](const std::unique_ptr<Bullet>& bullet) -> bool
-        {
-            return !bullet->isActive();
-        }
-    );
+                           [](const std::unique_ptr<Bullet> &bullet) -> bool {
+                               return !bullet->isActive();
+                           });
 
     if (it != mBullets.end())
     {
-        Bullet* bullet = it->get();
-        bullet->setActive(true);
+        Bullet *bullet = it->get();
+        bullet->setActive(true); // Make active this bullet
 
-        if (!mBulletSpawnListener.empty())
+        for (auto listener : mBulletSpawnListener)
         {
-            for (auto listener : mBulletSpawnListener)
-            {
-                listener->onBulletSpawn();
-            }
+            listener->onBulletSpawn(); // Send event of bullet spawn for
+                                       // listeners
         }
 
         return bullet;
     }
-    
+
     return nullptr;
 }

@@ -1,9 +1,11 @@
 #include "AsteroidManager.h"
 
-void AsteroidManager::init(SDL_Renderer* renderer, bool isBig, int count, int width, int height)
+void AsteroidManager::init(SDL_Renderer *renderer, bool isBig, int count,
+                           int width, int height)
 {
     for (int i = 0; i < count; ++i)
     {
+        // Create and initialize asteroids
         Asteroid asteroid;
         asteroid.init(renderer, isBig, width, height);
         mAsteroids.push_back(std::move(asteroid));
@@ -18,14 +20,12 @@ void AsteroidManager::init(SDL_Renderer* renderer, bool isBig, int count, int wi
     }
 }
 
-Asteroid& AsteroidManager::operator[] (int index)
-{
-    return mAsteroids[index];
-}
+Asteroid &AsteroidManager::operator[](int index) { return mAsteroids[index]; }
 
-void AsteroidManager::render(SDL_Renderer* renderer)
+void AsteroidManager::render(
+        SDL_Renderer *renderer) // Render asteroids which active
 {
-    for (const Asteroid& asteroid : mAsteroids)
+    for (const Asteroid &asteroid : mAsteroids)
     {
         if (asteroid.isActive())
         {
@@ -34,13 +34,26 @@ void AsteroidManager::render(SDL_Renderer* renderer)
     }
 }
 
+// Update position of active asteroids
 void AsteroidManager::update(int windowWidth, int windowHeight, float delta)
 {
-    for (Asteroid& asteroid : mAsteroids)
+    for (Asteroid &asteroid : mAsteroids)
     {
         if (asteroid.isActive())
         {
             asteroid.update(delta, windowWidth, windowHeight);
         }
     }
+}
+
+AsteroidManager &AsteroidManager::operator++()
+{
+    ++mActiveCount;
+    return *this;
+}
+
+AsteroidManager &AsteroidManager::operator--()
+{
+    --mActiveCount;
+    return *this;
 }

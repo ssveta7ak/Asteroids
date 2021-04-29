@@ -1,38 +1,37 @@
 #include "Asteroid.h"
 
-Asteroid::~Asteroid()
+void Asteroid::init(SDL_Renderer *renderer, bool big, int width, int height)
 {
-    mImage.reset();
-}
-
-void Asteroid::init(SDL_Renderer* renderer, bool big, int width, int height)
-{
-    const char* path = "assets/asteroid.png";
-    const char* path2 = "assets/small_asteroid.png";
+    const char *path = "assets/textures/asteroid.png";
+    const char *path2 = "assets/textures/small_asteroid.png";
     mImage = std::make_unique<Image>();
     if (big)
     {
+        // Initialize big asteroids
         mImage->createTexture(path, renderer);
         mActive = true;
         mSpeed = 20;
-        float  a = randomFloat(0.0, width);
-        float  b = randomFloat(0.0, height);
+        float a = randomFloat(0.0, width);
+        float b = randomFloat(0.0, height);
         mPosition = Vector2(a, b);
     }
     else
     {
+        // Initialize small asteroids
         mImage->createTexture(path2, renderer);
         mActive = false;
         mSpeed = 40;
         mPosition = Vector2(-50, -50);
     }
-    
+
     mAngle = randomFloat(0.0, 2 * M_PI);
     mRadius = radius();
 }
 
-
-Vector2 Asteroid::isInsideWindow(Vector2 position, int windowWidth, int windowHeight)
+// Check and return position inside the window
+// If object goes outside the window it appears in opposide window side
+Vector2 Asteroid::isInsideWindow(Vector2 position, int windowWidth,
+                                 int windowHeight)
 {
     Vector2 result;
     float max_x = windowWidth;
@@ -55,6 +54,7 @@ Vector2 Asteroid::isInsideWindow(Vector2 position, int windowWidth, int windowHe
     return result;
 }
 
+// Update asteroid position
 void Asteroid::update(float delta, int windowWidth, int windowHeight)
 {
     Vector2 position;
@@ -64,5 +64,4 @@ void Asteroid::update(float delta, int windowWidth, int windowHeight)
     position = isInsideWindow(position, windowWidth, windowHeight);
     setPosition(position);
 }
-void Asteroid::init(SDL_Renderer* renderer)
-{}
+void Asteroid::init(SDL_Renderer *renderer) {}

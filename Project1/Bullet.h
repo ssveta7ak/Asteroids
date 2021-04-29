@@ -5,9 +5,5 @@
 class Bullet : public Object
 {
 public:
-    Bullet() = default;
-    ~Bullet();
-
-    virtual void init(SDL_Renderer* renderer) override;
+    virtual void init(SDL_Renderer *renderer) override;
 };
-

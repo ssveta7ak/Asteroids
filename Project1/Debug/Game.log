@@ -1,0 +1,51 @@
+﻿  Animation.cpp
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  AnimationManager.cpp
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Asteroid.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  AsteroidManager.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Bullet.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  BulletManager.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  CollisionManager.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Game.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Image.cpp
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  main.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Object.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Player.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Settings.cpp
+  SoundManager.cpp
+E:\WORK\CA\Game\Game\SoundManager.h(3,10): fatal error C1083: Cannot open include file: 'SDL_mixer.h': No such file or directory
+  UIManager.cpp
+E:\WORK\CA\Game\Game\Image.h(3,10): fatal error C1083: Cannot open include file: 'SDL.h': No such file or directory
+  Vector2.cpp
+  The contents of <numbers> are available only with C++20 or later.
+E:\WORK\CA\Game\Game\Vector2.h(24,39): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Vector2.cpp(80,18): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+E:\WORK\CA\Game\Game\Vector2.cpp(115,16): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
+  Generating Code...

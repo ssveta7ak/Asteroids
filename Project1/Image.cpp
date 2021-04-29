@@ -1,7 +1,6 @@
 #include "Image.h"
 
-Image::Image()
-{}
+Image::Image() {}
 
 Image::~Image()
 {
@@ -15,12 +14,13 @@ Image::~Image()
     }
 }
 
-bool Image::createTexture(const char* path, SDL_Renderer* renderer)
+bool Image::createTexture(const char *path, SDL_Renderer *renderer)
 {
     mImage = IMG_Load(path);
     if (!mImage)
     {
-        printf("Unable to load image %s! SDL_image Error: %s\n", path, IMG_GetError());
+        printf("Unable to load image %s! SDL_image Error: %s\n", path,
+               IMG_GetError());
         return false;
     }
     mTexture = SDL_CreateTextureFromSurface(renderer, mImage);
@@ -29,16 +29,13 @@ bool Image::createTexture(const char* path, SDL_Renderer* renderer)
         printf("CreateTextureFromSurface failed: %s\n", SDL_GetError());
         return false;
     }
-    SDL_QueryTexture(mTexture, NULL, NULL, &mWidth, &mHeight);
+    SDL_QueryTexture(mTexture, nullptr, nullptr, &mWidth, &mHeight);
     return true;
 }
 
-SDL_Texture* Image::getTexture() const
-{
-    return mTexture;
-}
+SDL_Texture *Image::getTexture() const { return mTexture; }
 
-void Image::drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect)
+void Image::drawTexture(SDL_Renderer *renderer, const SDL_Rect &dest_rect)
 {
     SDL_Rect src_rect;
     src_rect.w = mWidth;
@@ -51,7 +48,9 @@ void Image::drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect)
     SDL_RenderPresent(renderer);
 }
 
-void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_RendererFlip flip /*= SDL_FLIP_NONE*/, float angle, SDL_Point* center)
+void Image::render(SDL_Renderer *renderer, const SDL_Rect &dest_rect,
+                   SDL_RendererFlip flip /*= SDL_FLIP_NONE*/, float angle,
+                   SDL_Point *center)
 {
     SDL_Rect src_rect;
     src_rect.w = mWidth;
@@ -59,14 +58,17 @@ void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect, SDL_Render
     src_rect.x = 0;
     src_rect.y = 0;
 
-    //Render to screen
-    int res = SDL_RenderCopyEx(renderer, mTexture, &src_rect, &dest_rect, angle, center, flip);
+    // Render to screen
+    int res = SDL_RenderCopyEx(renderer, mTexture, &src_rect, &dest_rect, angle,
+                               center, flip);
 }
 
-bool Image::createFromRenderedText(const char* textureText, SDL_Color textColor, int textSize, SDL_Renderer* renderer)
+bool Image::createFromRenderedText(const char *textureText, SDL_Color textColor,
+                                   int textSize, SDL_Renderer *renderer)
 {
-    //Globally used font
-    TTF_Font* gFont = TTF_OpenFont("assets/Lexend/Lexend-SemiBold.ttf", textSize);
+    // Globally used font
+    TTF_Font *gFont =
+            TTF_OpenFont("assets/fonts/Lexend-SemiBold.ttf", textSize);
     if (!gFont)
     {
         printf("Failed to load lazy font! SDL_ttf Error: %s\n", TTF_GetError());
@@ -77,24 +79,26 @@ bool Image::createFromRenderedText(const char* textureText, SDL_Color textColor,
         mImage = TTF_RenderText_Solid(gFont, textureText, textColor);
         if (!mImage)
         {
-            printf("Unable to render text surface! SDL_ttf Error: %s\n", TTF_GetError());
+            printf("Unable to render text surface! SDL_ttf Error: %s\n",
+                   TTF_GetError());
             return false;
         }
         else
         {
-            //Create texture from surface pixels
+            // Create texture from surface pixels
             mTexture = SDL_CreateTextureFromSurface(renderer, mImage);
             if (!mTexture)
             {
-                printf("Unable to create texture from rendered text! SDL Error: %s\n", SDL_GetError());
+                printf("Unable to create texture from rendered text! SDL "
+                       "Error: %s\n",
+                       SDL_GetError());
                 return false;
             }
             else
             {
-                SDL_QueryTexture(mTexture, NULL, NULL, &mWidth, &mHeight);
+                SDL_QueryTexture(mTexture, nullptr, nullptr, &mWidth, &mHeight);
             }
         }
-        
     }
-    return mTexture != NULL;
+    return mTexture != nullptr;
 }

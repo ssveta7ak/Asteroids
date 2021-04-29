@@ -1,13 +1,8 @@
 #include "Bullet.h"
 
-Bullet::~Bullet()
+void Bullet::init(SDL_Renderer *renderer)
 {
-    mImage.reset();
-}
-
-void Bullet::init(SDL_Renderer* renderer)
-{
-    const char* path = "assets/bullet.png";
+    const char *path = "assets/textures/bullet.png";
     mImage = std::make_unique<Image>();
     mImage->createTexture(path, renderer);
     mSpeed = 500;

@@ -1,20 +1,21 @@
 #include "AnimationManager.h"
 #include "Asteroid.h"
 
-
-void AnimationManager::init(SDL_Renderer* renderer)
+void AnimationManager::init(SDL_Renderer *renderer)
 {
     mRenderer = renderer;
     mAnimation.init(mRenderer);
 }
 
-void AnimationManager::onPlayerKilled(const Asteroid& asteroid)
+// Activate animation when player was destroyed
+void AnimationManager::onPlayerKilled(const Asteroid &asteroid)
 {
     mAnimation.isActive = true;
     mAnimation.setPosition(asteroid.position());
 }
 
-void AnimationManager::onAsteroidDestroyed(const Asteroid& asteroid)
+// Activate animation when asteroid was destroed
+void AnimationManager::onAsteroidDestroyed(const Asteroid &asteroid)
 {
     mAnimation.isActive = true;
     mAnimation.setPosition(asteroid.position());
@@ -24,12 +25,13 @@ void AnimationManager::animate()
 {
     if (mAnimation.isActive && mAnimation.mDuration > 0)
     {
-        //Renmder current frame
-        SDL_Rect* currentClip = &mAnimation.mSpriteClips[frame / 3];
-        mAnimation.render(mRenderer, mAnimation.position().x, mAnimation.position().y, currentClip);
+        // Render current frame
+        SDL_Rect *currentClip = &mAnimation.mSpriteClips[frame / 3];
+        mAnimation.render(mRenderer, mAnimation.position().x,
+                          mAnimation.position().y, currentClip);
         ++frame;
 
-        //Cycle animation
+        // Cycle animation
         if (frame / 3 >= mAnimation.ANIMATION_FRAMES)
         {
             frame = 0;
@@ -41,4 +43,3 @@ void AnimationManager::animate()
         mAnimation.reset();
     }
 }
-

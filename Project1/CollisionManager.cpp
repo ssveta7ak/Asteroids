@@ -1,84 +1,87 @@
 #include "CollisionManager.h"
 
-
-void CollisionManager::update( BulletManager& bullets, AsteroidManager& asteroids,
-    AsteroidManager& smallAsteroids, Player& player)
+void CollisionManager::update(BulletManager &bullets,
+                              AsteroidManager &asteroids,
+                              AsteroidManager &smallAsteroids, Player &player)
 {
-    //check crossing bullet and asteroid
+    // check crossing bullet and asteroid
     for (int i = 0; i < bullets.size(); ++i)
     {
         if (bullets[i]->isActive())
         {
             for (int j = 0; j < asteroids.size(); ++j)
             {
-                Object* obj1 = bullets[i].get();
-                Object* obj2 = &asteroids[j];
+                Object *obj1 = bullets[i].get();
+                Object *obj2 = &asteroids[j];
 
+                // Check collision of two objects
                 bool iscross = Object::iscrossed(*obj1, *obj2);
                 if (iscross)
                 {
-                    if (!mAsteroidDestroyedListener.empty())
+                    for (auto listener : mAsteroidDestroyedListener)
                     {
-                        for (auto listener : mAsteroidDestroyedListener)
-                        {
-                            listener->onAsteroidDestroyed(asteroids[j]);
-                        }
+                        // Send event of asteroid destroying for listeners
+                        listener->onAsteroidDestroyed(asteroids[j]);
                     }
+
+                    // Create two small asteroids after destroying big asteroid
                     for (int k = 0; k < smallAsteroids.size(); ++k)
                     {
                         if (!smallAsteroids[k].isActive())
                         {
                             smallAsteroids[k].setActive(true);
-                            smallAsteroids[k].setPosition(asteroids[j].position());
-                            smallAsteroids.setActiveCount(smallAsteroids.activeCount() + 1);
+                            smallAsteroids[k].setPosition(
+                                    asteroids[j].position());
+                            ++smallAsteroids;
                             for (int t = k; t < smallAsteroids.size(); ++t)
                             {
                                 if (!smallAsteroids[t].isActive())
                                 {
                                     smallAsteroids[t].setActive(true);
-                                    smallAsteroids[t].setPosition(asteroids[j].position());
-                                    smallAsteroids.setActiveCount(smallAsteroids.activeCount() + 1);
+                                    smallAsteroids[t].setPosition(
+                                            asteroids[j].position());
+                                    ++smallAsteroids;
                                     break;
                                 }
                             }
                             break;
                         }
                     }
-                    asteroids.setActiveCount(asteroids.activeCount() - 1);
-                    asteroids[j].reset(); //set default
-                    bullets[i]->reset(); //set default
+                    // Decrease count of active big asteroids
+                    --asteroids;
+                    asteroids[j].reset(); // Set default properties
+                    bullets[i]->reset();  // Set default properties
                     break;
                 }
             }
         }
-
     }
 
-    //check crossing bullet and small asteroid
-    for (std::unique_ptr<Bullet>& bullet : bullets)
+    // check crossing bullet and small asteroid
+    for (std::unique_ptr<Bullet> &bullet : bullets)
     {
         if (bullet->isActive())
         {
-            for (Asteroid& smallAsteroid : smallAsteroids)
+            for (Asteroid &smallAsteroid : smallAsteroids)
             {
                 if (smallAsteroid.isActive())
                 {
-                    Object* obj1 = bullet.get();
-                    Object* obj2 = &smallAsteroid;
+                    Object *obj1 = bullet.get();
+                    Object *obj2 = &smallAsteroid;
 
                     bool iscross = Object::iscrossed(*obj1, *obj2);
                     if (iscross)
                     {
-                        if (!mAsteroidDestroyedListener.empty())
+                        for (auto listener : mAsteroidDestroyedListener)
                         {
-                            for (auto listener : mAsteroidDestroyedListener)
-                            {
-                                listener->onAsteroidDestroyed(smallAsteroid);
-                            }
+                            // Send event of asteroid destroying for listeners
+                            listener->onAsteroidDestroyed(smallAsteroid);
                         }
-                        smallAsteroids.setActiveCount(smallAsteroids.activeCount() - 1);
-                        smallAsteroid.reset();
-                        bullet->reset();
+
+                        // Decrease count of active small asteroids
+                        --smallAsteroids;
+                        smallAsteroid.reset(); // Set default properties
+                        bullet->reset();       // Set default properties
                         break;
                     }
                 }
@@ -86,52 +89,51 @@ void CollisionManager::update( BulletManager& bullets, AsteroidManager& asteroid
         }
     }
 
-    //check crossing player and asteroid
-    for (Asteroid& asteroid : asteroids)
+    // check crossing player and asteroid
+    for (Asteroid &asteroid : asteroids)
     {
         if (player.isActive())
         {
-            Object* obj1 = &asteroid;
-            Object* obj2 = &player;
+            Object *obj1 = &asteroid;
+            Object *obj2 = &player;
             bool iscross = Object::iscrossed(*obj1, *obj2);
             if (iscross)
             {
-                if (!mPlayerKilledListener.empty())
+                for (auto listener : mPlayerKilledListener)
                 {
-                    for (auto listener : mPlayerKilledListener)
-                    {
-                        listener->onPlayerKilled(asteroid);
-                    }
+                    // Send event of player killing for listeners
+                    listener->onPlayerKilled(asteroid);
                 }
-                asteroids.setActiveCount(asteroids.activeCount() - 1);
-                asteroid.reset(); //set default
+
+                // Decrease count of active big asteroids
+                --asteroids;
+                asteroid.reset(); // Set default properties
                 return;
             }
         }
     }
 
-    //check crossing player and small asteroid
-    for (Asteroid& smallAsteroid : smallAsteroids)
+    // check crossing player and small asteroid
+    for (Asteroid &smallAsteroid : smallAsteroids)
     {
         if (smallAsteroid.isActive() && player.isActive())
         {
-            Object* obj1 = &smallAsteroid;
-            Object* obj2 = &player;
+            Object *obj1 = &smallAsteroid;
+            Object *obj2 = &player;
             bool iscross = Object::iscrossed(*obj1, *obj2);
             if (iscross)
             {
-                if (!mPlayerKilledListener.empty())
+                for (auto listener : mPlayerKilledListener)
                 {
-                    for (auto listener : mPlayerKilledListener)
-                    {
-                        listener->onPlayerKilled(smallAsteroid);
-                    }
+                    // Send event of player killing for listeners
+                    listener->onPlayerKilled(smallAsteroid);
                 }
-                smallAsteroids.setActiveCount(smallAsteroids.activeCount() - 1);
-                smallAsteroid.reset(); //set default
+
+                // Decrease count of active small asteroids
+                --smallAsteroids;
+                smallAsteroid.reset(); // Set default properties
                 return;
             }
         }
     }
 }
-
