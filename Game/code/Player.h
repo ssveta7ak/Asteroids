@@ -5,8 +5,8 @@
 class Player : public Object
 {
 public:
-    virtual void init(SDL_Renderer *renderer) override;
-    virtual void render(SDL_Renderer *renderer) const override;
+    virtual void init(SDL_Renderer* renderer) override;
+    virtual void render(SDL_Renderer* renderer) const override;
     Vector2 isInsideWindow(Vector2 position, int windowWidth, int windowHeight);
     void changeAngleTo(float deltaDegrees);
     void moveForward(float delta, int windowWidth, int windowHeight,

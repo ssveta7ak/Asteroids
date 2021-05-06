@@ -1,9 +1,9 @@
 #include "Asteroid.h"
 
-void Asteroid::init(SDL_Renderer *renderer, bool big, int width, int height)
+void Asteroid::init(SDL_Renderer* renderer, bool big, int width, int height)
 {
-    const char *path = "assets/textures/asteroid.png";
-    const char *path2 = "assets/textures/small_asteroid.png";
+    const char* path = "assets/textures/asteroid.png";
+    const char* path2 = "assets/textures/small_asteroid.png";
     mImage = std::make_unique<Image>();
     if (big)
     {
@@ -64,4 +64,4 @@ void Asteroid::update(float delta, int windowWidth, int windowHeight)
     position = isInsideWindow(position, windowWidth, windowHeight);
     setPosition(position);
 }
-void Asteroid::init(SDL_Renderer *renderer) {}
+void Asteroid::init(SDL_Renderer* renderer) {}

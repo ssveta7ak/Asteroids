@@ -1,8 +1,8 @@
 #include "CollisionManager.h"
 
-void CollisionManager::update(BulletManager &bullets,
-                              AsteroidManager &asteroids,
-                              AsteroidManager &smallAsteroids, Player &player)
+void CollisionManager::update(BulletManager& bullets,
+                              AsteroidManager& asteroids,
+                              AsteroidManager& smallAsteroids, Player& player)
 {
     // check crossing bullet and asteroid
     for (int i = 0; i < bullets.size(); ++i)
@@ -11,8 +11,8 @@ void CollisionManager::update(BulletManager &bullets,
         {
             for (int j = 0; j < asteroids.size(); ++j)
             {
-                Object *obj1 = bullets[i].get();
-                Object *obj2 = &asteroids[j];
+                Object* obj1 = bullets[i].get();
+                Object* obj2 = &asteroids[j];
 
                 // Check collision of two objects
                 bool iscross = Object::iscrossed(*obj1, *obj2);
@@ -58,16 +58,16 @@ void CollisionManager::update(BulletManager &bullets,
     }
 
     // check crossing bullet and small asteroid
-    for (std::unique_ptr<Bullet> &bullet : bullets)
+    for (std::unique_ptr<Bullet>& bullet : bullets)
     {
         if (bullet->isActive())
         {
-            for (Asteroid &smallAsteroid : smallAsteroids)
+            for (Asteroid& smallAsteroid : smallAsteroids)
             {
                 if (smallAsteroid.isActive())
                 {
-                    Object *obj1 = bullet.get();
-                    Object *obj2 = &smallAsteroid;
+                    Object* obj1 = bullet.get();
+                    Object* obj2 = &smallAsteroid;
 
                     bool iscross = Object::iscrossed(*obj1, *obj2);
                     if (iscross)
@@ -90,12 +90,12 @@ void CollisionManager::update(BulletManager &bullets,
     }
 
     // check crossing player and asteroid
-    for (Asteroid &asteroid : asteroids)
+    for (Asteroid& asteroid : asteroids)
     {
         if (player.isActive())
         {
-            Object *obj1 = &asteroid;
-            Object *obj2 = &player;
+            Object* obj1 = &asteroid;
+            Object* obj2 = &player;
             bool iscross = Object::iscrossed(*obj1, *obj2);
             if (iscross)
             {
@@ -114,12 +114,12 @@ void CollisionManager::update(BulletManager &bullets,
     }
 
     // check crossing player and small asteroid
-    for (Asteroid &smallAsteroid : smallAsteroids)
+    for (Asteroid& smallAsteroid : smallAsteroids)
     {
         if (smallAsteroid.isActive() && player.isActive())
         {
-            Object *obj1 = &smallAsteroid;
-            Object *obj2 = &player;
+            Object* obj1 = &smallAsteroid;
+            Object* obj2 = &player;
             bool iscross = Object::iscrossed(*obj1, *obj2);
             if (iscross)
             {

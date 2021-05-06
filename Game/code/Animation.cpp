@@ -1,6 +1,6 @@
 #include "Animation.h"
 
-void Animation::init(SDL_Renderer *renderer)
+void Animation::init(SDL_Renderer* renderer)
 {
     mAnimation = std::make_unique<Image>();
     if (mAnimation->createTexture("assets/textures/explosion.png", renderer))
@@ -25,7 +25,7 @@ void Animation::init(SDL_Renderer *renderer)
     }
 }
 
-void Animation::render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip)
+void Animation::render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip)
 {
     // Set rendering space and render to screen
     SDL_Rect renderQuad = {x, y, mAnimation->width(), mAnimation->height()};

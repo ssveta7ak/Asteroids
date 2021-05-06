@@ -12,20 +12,20 @@ class Object
 public:
     Object() = default;
 
-    Object(const Object &rhs) = delete;
-    Object &operator=(const Object &rhs) = delete;
+    Object(const Object& rhs) = delete;
+    Object& operator=(const Object& rhs) = delete;
 
-    Object(Object &&rhs) = default;
-    Object &operator=(Object &&rhs) = default;
+    Object(Object&& rhs) = default;
+    Object& operator=(Object&& rhs) = default;
 
     virtual ~Object() = default;
 
-    virtual void init(SDL_Renderer *renderer) = 0;
-    virtual void render(SDL_Renderer *renderer) const;
+    virtual void init(SDL_Renderer* renderer) = 0;
+    virtual void render(SDL_Renderer* renderer) const;
     virtual void update(float delta);
 
     static float randomFloat(float a, float b);
-    static bool iscrossed(const Object &A, const Object &B);
+    static bool iscrossed(const Object& A, const Object& B);
 
     bool isInsideWindow(int windowWidth, int windowHeight);
     float radius() const;

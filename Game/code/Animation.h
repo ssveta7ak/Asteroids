@@ -8,8 +8,8 @@
 class Animation
 {
 public:
-    void init(SDL_Renderer *renderer);
-    void render(SDL_Renderer *renderer, int x, int y, SDL_Rect *clip = nullptr);
+    void init(SDL_Renderer* renderer);
+    void render(SDL_Renderer* renderer, int x, int y, SDL_Rect* clip = nullptr);
     void reset();
 
     Vector2 position() const { return mPosition; }

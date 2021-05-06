@@ -21,7 +21,7 @@ public:
     Game();
     ~Game();
 
-    void init(const char *title);
+    void init(const char* title);
     void handleEvents();
     void update();
     void render();
@@ -35,14 +35,14 @@ public:
     void initAsteroids();
     void initPlayer();
     void initAnimation();
-    void initWindow(const char *title, int xpos, int ypos, int width,
+    void initWindow(const char* title, int xpos, int ypos, int width,
                     int height, bool fullscreen);
 
     void fireBullet();
     void deletePlayer();
     void newGame();
 
-    virtual void onPlayerKilled(const Asteroid &asteroid) override;
+    virtual void onPlayerKilled(const Asteroid& asteroid) override;
 
 private:
     bool isRunning = false;
@@ -51,10 +51,10 @@ private:
     bool mIsCrossed = false;
 
     float mDelta = 0;
-    SDL_Window *mWindow = nullptr;
+    SDL_Window* mWindow = nullptr;
     int mWindowWidth;
     int mWindowHeight;
-    SDL_Renderer *mRenderer = nullptr;
+    SDL_Renderer* mRenderer = nullptr;
     std::unique_ptr<Player> mPlayer;
 
     Settings settings;

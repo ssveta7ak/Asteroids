@@ -1,6 +1,6 @@
 #include "Object.h"
 
-void Object::render(SDL_Renderer *renderer) const
+void Object::render(SDL_Renderer* renderer) const
 {
     SDL_Rect dest_rect;
     dest_rect.w = mImage->width();
@@ -57,7 +57,7 @@ float Object::radius() const
 }
 
 // Check collision of two objects.
-bool Object::iscrossed(const Object &A, const Object &B)
+bool Object::iscrossed(const Object& A, const Object& B)
 {
     float dist = Vector2::distance(A.center(), B.center());
     if (dist <= (A.mRadius + B.mRadius))

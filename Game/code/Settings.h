@@ -3,7 +3,7 @@
 class Settings
 {
 public:
-    void init(const char *path);
+    void init(const char* path);
     int width() const { return mWidth; }
     int height() const { return mHeight; }
     bool fullscreen() const { return mFullscreen; }

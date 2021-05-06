@@ -4,7 +4,7 @@
 
 using json = nlohmann::json;
 
-void Settings::init(const char *path)
+void Settings::init(const char* path)
 {
     // load settings for window resolution
     std::ifstream ifs(path);

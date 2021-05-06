@@ -12,7 +12,7 @@ Game::~Game()
     // Free resources
     mPlayer.reset();
 
-    for (std::unique_ptr<Bullet> &bullet : mBullets)
+    for (std::unique_ptr<Bullet>& bullet : mBullets)
     {
         bullet.reset();
     }
@@ -48,7 +48,7 @@ void Game::initAsteroids()
 
 void Game::initAnimation() { mAnimation.init(mRenderer); }
 
-void Game::initWindow(const char *title, int xpos, int ypos, int width,
+void Game::initWindow(const char* title, int xpos, int ypos, int width,
                       int height, bool fullscreen)
 {
     int flags = 0;
@@ -101,7 +101,7 @@ void Game::initPlayer()
     mPlayer->setPosition(Vector2(1, 1));
 }
 
-void Game::init(const char *title)
+void Game::init(const char* title)
 {
     settings.init("assets/settings/settings.json");
     initWindow("Game", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -115,11 +115,11 @@ void Game::init(const char *title)
 
     // Add event listeners
     mBullets.addListener(&mSound);
-    mCollisions.addListener((AsteroidDestroyedListener *)&mSound);
-    mCollisions.addListener((AsteroidDestroyedListener *)&mAnimation);
+    mCollisions.addListener((AsteroidDestroyedListener*)&mSound);
+    mCollisions.addListener((AsteroidDestroyedListener*)&mAnimation);
     mCollisions.addListener(this);
-    mCollisions.addListener((PlayerKilledListner *)&mSound);
-    mCollisions.addListener((PlayerKilledListner *)&mAnimation);
+    mCollisions.addListener((PlayerKilledListner*)&mSound);
+    mCollisions.addListener((PlayerKilledListner*)&mAnimation);
 }
 
 void Game::handleEvents()
@@ -137,7 +137,7 @@ void Game::handleEvents()
     SDL_Event event;
     while (SDL_PollEvent(&event) != 0)
     {
-        const uint8_t *currentKeyStates = SDL_GetKeyboardState(nullptr);
+        const uint8_t* currentKeyStates = SDL_GetKeyboardState(nullptr);
         if (mPlayer)
         {
             if (currentKeyStates[SDL_SCANCODE_LEFT])
@@ -208,7 +208,7 @@ void Game::update()
         mGameWin = true;
 
         // Set all bullets inactive
-        for (std::unique_ptr<Bullet> &bullet : mBullets)
+        for (std::unique_ptr<Bullet>& bullet : mBullets)
         {
             bullet->setActive(false);
         }
@@ -282,7 +282,7 @@ void Game::render()
 void Game::fireBullet()
 {
     // Set active bullet. Position and angle are taken from Player.
-    Bullet *bullet = mBullets.spawnBullet();
+    Bullet* bullet = mBullets.spawnBullet();
     bullet->setPosition(mPlayer->center());
     bullet->setAngle(mPlayer->angle());
 }
@@ -296,7 +296,7 @@ void Game::newGame()
     initPlayer();
 
     // Activate all asteroids, set random positions inside the window
-    for (Asteroid &asteroid : mAsteroids)
+    for (Asteroid& asteroid : mAsteroids)
     {
         asteroid.setActive(true);
         asteroid.setAngle(Asteroid::randomFloat(0.0, 2 * M_PI));
@@ -309,7 +309,7 @@ void Game::newGame()
 }
 
 // Delete player when objects collision is happened
-void Game::onPlayerKilled(const Asteroid &asteroid)
+void Game::onPlayerKilled(const Asteroid& asteroid)
 {
     deletePlayer();
     mGameFail = true;

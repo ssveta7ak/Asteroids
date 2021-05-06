@@ -14,7 +14,7 @@ Image::~Image()
     }
 }
 
-bool Image::createTexture(const char *path, SDL_Renderer *renderer)
+bool Image::createTexture(const char* path, SDL_Renderer* renderer)
 {
     mImage = IMG_Load(path);
     if (!mImage)
@@ -33,9 +33,9 @@ bool Image::createTexture(const char *path, SDL_Renderer *renderer)
     return true;
 }
 
-SDL_Texture *Image::getTexture() const { return mTexture; }
+SDL_Texture* Image::getTexture() const { return mTexture; }
 
-void Image::drawTexture(SDL_Renderer *renderer, const SDL_Rect &dest_rect)
+void Image::drawTexture(SDL_Renderer* renderer, const SDL_Rect& dest_rect)
 {
     SDL_Rect src_rect;
     src_rect.w = mWidth;
@@ -48,9 +48,9 @@ void Image::drawTexture(SDL_Renderer *renderer, const SDL_Rect &dest_rect)
     SDL_RenderPresent(renderer);
 }
 
-void Image::render(SDL_Renderer *renderer, const SDL_Rect &dest_rect,
+void Image::render(SDL_Renderer* renderer, const SDL_Rect& dest_rect,
                    SDL_RendererFlip flip /*= SDL_FLIP_NONE*/, float angle,
-                   SDL_Point *center)
+                   SDL_Point* center)
 {
     SDL_Rect src_rect;
     src_rect.w = mWidth;
@@ -63,11 +63,11 @@ void Image::render(SDL_Renderer *renderer, const SDL_Rect &dest_rect,
                                center, flip);
 }
 
-bool Image::createFromRenderedText(const char *textureText, SDL_Color textColor,
-                                   int textSize, SDL_Renderer *renderer)
+bool Image::createFromRenderedText(const char* textureText, SDL_Color textColor,
+                                   int textSize, SDL_Renderer* renderer)
 {
     // Globally used font
-    TTF_Font *gFont =
+    TTF_Font* gFont =
             TTF_OpenFont("assets/fonts/Lexend-SemiBold.ttf", textSize);
     if (!gFont)
     {

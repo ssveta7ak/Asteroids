@@ -1,6 +1,6 @@
 #include "UIManager.h"
 
-bool UIManager::init(SDL_Renderer *renderer)
+bool UIManager::init(SDL_Renderer* renderer)
 {
     bool success = true;
     SDL_Color textColor = {255, 0, 0};
@@ -35,7 +35,7 @@ bool UIManager::init(SDL_Renderer *renderer)
     return success;
 }
 
-void UIManager::render(SDL_Renderer *renderer, Image *textImage, int x, int y)
+void UIManager::render(SDL_Renderer* renderer, Image* textImage, int x, int y)
 {
     SDL_Rect dest_rect;
     dest_rect.w = textImage->width();

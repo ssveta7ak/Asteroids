@@ -7,55 +7,55 @@ Vector2::Vector2(int x, int y)
 {
 }
 
-Vector2 operator+(const Vector2 &v1, const Vector2 &v2)
+Vector2 operator+(const Vector2& v1, const Vector2& v2)
 {
     return Vector2(v1.x + v2.x, v1.y + v2.y);
 }
 
-Vector2 operator-(const Vector2 &v1, const Vector2 &v2)
+Vector2 operator-(const Vector2& v1, const Vector2& v2)
 {
     return Vector2(v1.x - v2.x, v1.y - v2.y);
 }
 
-Vector2 operator*(const Vector2 &v1, const Vector2 &v2)
+Vector2 operator*(const Vector2& v1, const Vector2& v2)
 {
     return Vector2(v1.x * v2.x, v1.y * v2.y);
 }
 
-Vector2 operator*(const Vector2 &v1, float value)
+Vector2 operator*(const Vector2& v1, float value)
 {
     return Vector2(v1.x * value, v1.y * value);
 }
 
-Vector2 operator*(float value, const Vector2 &v1)
+Vector2 operator*(float value, const Vector2& v1)
 {
     return Vector2(v1.x * value, v1.y * value);
 }
 
-Vector2 operator/(const Vector2 &v1, const Vector2 &v2)
+Vector2 operator/(const Vector2& v1, const Vector2& v2)
 {
     return Vector2(v1.x / v2.x, v1.y / v2.y);
 }
 
-Vector2 operator/(const Vector2 &v1, float value)
+Vector2 operator/(const Vector2& v1, float value)
 {
     return Vector2(v1.x / value, v1.y / value);
 }
 
-Vector2 Vector2::operator+=(const Vector2 &v) { return *this + v; }
+Vector2 Vector2::operator+=(const Vector2& v) { return *this + v; }
 
-Vector2 Vector2::operator-=(const Vector2 &v) { return *this - v; }
+Vector2 Vector2::operator-=(const Vector2& v) { return *this - v; }
 
-Vector2 Vector2::operator*=(const Vector2 &v) { return *this * v; }
+Vector2 Vector2::operator*=(const Vector2& v) { return *this * v; }
 
 Vector2 Vector2::operator*=(float value) { return *this * value; }
 
-Vector2 Vector2::operator/=(const Vector2 &v) { return *this / v; }
+Vector2 Vector2::operator/=(const Vector2& v) { return *this / v; }
 
 Vector2 Vector2::operator/=(float value) { return *this / value; }
 
-float Vector2::angle(const Vector2 &v1,
-                     const Vector2 &v2) // Get angle  between two vectors
+float Vector2::angle(const Vector2& v1,
+                     const Vector2& v2) // Get angle  between two vectors
 {
     const float PI_F = 3.14159265358979f;
     float cos_angle = dot(v1, v2) / (v1.lenght() * v2.lenght());
@@ -81,7 +81,7 @@ Vector2 Vector2::makeRotation(float angle)
                    static_cast<float>(sin(angle)));
 }
 
-bool Vector2::isLeft(const Vector2 &v) // Return true if *this vector is in the
+bool Vector2::isLeft(const Vector2& v) // Return true if *this vector is in the
                                        // left side of vector v
 {
     Vector2 rot90(-(this->y), this->x); // This is vector *this which was
@@ -94,7 +94,7 @@ bool Vector2::isLeft(const Vector2 &v) // Return true if *this vector is in the
 }
 
 // Get distance between two points
-float Vector2::distance(const Vector2 &pointA, const Vector2 &pointB)
+float Vector2::distance(const Vector2& pointA, const Vector2& pointB)
 {
     float diff = (pointB.x - pointA.x) * (pointB.x - pointA.x) +
                  (pointB.y - pointA.y) * (pointB.y - pointA.y);

@@ -1,8 +1,8 @@
 #include "Player.h"
 
-void Player::init(SDL_Renderer *renderer)
+void Player::init(SDL_Renderer* renderer)
 {
-    const char *path = "assets/textures/ship.png";
+    const char* path = "assets/textures/ship.png";
     mImage = std::make_unique<Image>();
     mImage->createTexture(path, renderer);
     mSpeed = 1;
@@ -10,7 +10,7 @@ void Player::init(SDL_Renderer *renderer)
     mActive = true;
 }
 
-void Player::render(SDL_Renderer *renderer) const
+void Player::render(SDL_Renderer* renderer) const
 {
     SDL_Rect dest_rect;
     dest_rect.w = mImage->width();

@@ -5,5 +5,5 @@
 class Bullet : public Object
 {
 public:
-    virtual void init(SDL_Renderer *renderer) override;
+    virtual void init(SDL_Renderer* renderer) override;
 };

@@ -14,16 +14,16 @@ public:
     bool init();
 
 private:
-    virtual void onPlayerKilled(const Asteroid &asteroid) override
+    virtual void onPlayerKilled(const Asteroid& asteroid) override
     {
         Mix_PlayMusic(mExplosion, 1);
     }
     virtual void onBulletSpawn() override { Mix_PlayMusic(mShot, 1); }
-    virtual void onAsteroidDestroyed(const Asteroid &asteroid) override
+    virtual void onAsteroidDestroyed(const Asteroid& asteroid) override
     {
         Mix_PlayMusic(mExplosion, 1);
     }
 
-    Mix_Music *mShot = nullptr;
-    Mix_Music *mExplosion = nullptr;
+    Mix_Music* mShot = nullptr;
+    Mix_Music* mExplosion = nullptr;
 };
