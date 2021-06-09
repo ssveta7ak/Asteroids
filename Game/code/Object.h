@@ -1,7 +1,8 @@
 #pragma once
 
 #include "Image.h"
-#include "Vector2.h"
+//#include "Vector2.h"
+#include "Rect.h"
 #include <memory>
 
 #define DEGREES_FROM_RADIANS(x) (x) * 180.0f / M_PI
@@ -31,6 +32,7 @@ public:
     float radius() const;
     void reset();
     Vector2 center() const;
+    Rect getRectangle() const;
 
     Vector2 position() const { return mPosition; }
     void setPosition(Vector2 position);

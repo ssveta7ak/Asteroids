@@ -11,7 +11,7 @@
 #include "Settings.h"
 #include "SoundManager.h"
 #include "UIManager.h"
-#include "Vector2.h"
+#include "Quadtree.h"
 #include <chrono>
 #include <memory>
 
@@ -38,6 +38,7 @@ public:
     void initWindow(const char* title, int xpos, int ypos, int width,
                     int height, bool fullscreen);
 
+    Quadtree createQuadTree();
     void fireBullet();
     void deletePlayer();
     void newGame();
@@ -69,4 +70,5 @@ private:
     using time_point = std::chrono::time_point<std::chrono::system_clock>;
     time_point mLastTime;
     time_point mLastTimeBulletSpawn;
+    time_point mUpdateTime;
 };

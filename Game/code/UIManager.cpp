@@ -4,14 +4,16 @@ bool UIManager::init(SDL_Renderer* renderer)
 {
     bool success = true;
     SDL_Color textColor = {255, 0, 0};
-    if (!mGameOverText.createFromRenderedText("GAME OVER", textColor, 70,
+    mGameOverText = std::make_unique<Image>();
+    if (!mGameOverText->createFromRenderedText("GAME OVER", textColor, 70,
                                               renderer))
     {
         printf("Failed to render text texture!\n");
         success = false;
     }
     textColor = {255, 255, 255};
-    if (!mInstruction.createFromRenderedText(
+    mInstruction = std::make_unique<Image>();
+    if (!mInstruction->createFromRenderedText(
                 "ESCAPE:  Exit Game             ENTER:  New Game", textColor,
                 25, renderer))
     {
@@ -19,7 +21,8 @@ bool UIManager::init(SDL_Renderer* renderer)
         success = false;
     }
     textColor = {255, 255, 255};
-    if (!mInstruction2.createFromRenderedText(
+    mInstruction2 = std::make_unique<Image>();
+    if (!mInstruction2->createFromRenderedText(
                 "ESCAPE:  Exit Game             ENTER:  Continue", textColor,
                 25, renderer))
     {
@@ -27,7 +30,8 @@ bool UIManager::init(SDL_Renderer* renderer)
         success = false;
     }
     textColor = {0, 255, 0};
-    if (!mWinText.createFromRenderedText("YOU WIN!", textColor, 70, renderer))
+    mWinText = std::make_unique<Image>();
+    if (!mWinText->createFromRenderedText("YOU WIN!", textColor, 70, renderer))
     {
         printf("Failed to render text texture!\n");
         success = false;

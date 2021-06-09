@@ -12,7 +12,7 @@ public:
     void update(int windowWidth, int windowHeight, float delta);
     void setActiveCount(int count) { mActiveCount = count; }
     int activeCount() const { return mActiveCount; }
-    int size() const { return static_cast<int>(mAsteroids.size()); }
+    int size() const { return (mAsteroids.size()); }
     Asteroid& operator[](const int index);
     AsteroidManager& operator++();
     AsteroidManager& operator--();

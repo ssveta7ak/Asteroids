@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Image.h"
+#include <memory>
 
 class UIManager
 {
@@ -8,14 +9,14 @@ public:
     bool init(SDL_Renderer* renderer);
     void render(SDL_Renderer* renderer, Image* text, int x, int y);
 
-    Image* GameOverText() { return &mGameOverText; }
-    Image* Instruction() { return &mInstruction; }
-    Image* Instruction2() { return &mInstruction2; }
-    Image* WinText() { return &mWinText; }
+    Image* GameOverText() { return mGameOverText.get(); }
+    Image* Instruction() { return mInstruction.get(); }
+    Image* Instruction2() { return mInstruction2.get(); }
+    Image* WinText() { return mWinText.get(); }
 
 private:
-    Image mGameOverText;
-    Image mInstruction;
-    Image mInstruction2;
-    Image mWinText;
+    std::unique_ptr<Image> mGameOverText;
+    std::unique_ptr<Image> mInstruction;
+    std::unique_ptr<Image> mInstruction2;
+    std::unique_ptr<Image> mWinText;
 };

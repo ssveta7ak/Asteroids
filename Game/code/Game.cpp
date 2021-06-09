@@ -5,6 +5,7 @@ Game::Game()
     // Initialize time members
     mLastTime = std::chrono::system_clock::now();
     mLastTimeBulletSpawn = std::chrono::system_clock::now();
+    mUpdateTime = std::chrono::system_clock::now();
 }
 
 Game::~Game()
@@ -42,8 +43,8 @@ void Game::initBullets()
 void Game::initAsteroids()
 {
     // Create and init asteroids inside game window
-    mAsteroids.init(mRenderer, true, 10, mWindowWidth, mWindowHeight);
-    mSmallAsteroids.init(mRenderer, false, 30, mWindowWidth, mWindowHeight);
+    mAsteroids.init(mRenderer, true, 15, mWindowWidth, mWindowHeight);
+    mSmallAsteroids.init(mRenderer, false, 35, mWindowWidth, mWindowHeight);
 }
 
 void Game::initAnimation() { mAnimation.init(mRenderer); }
@@ -199,9 +200,34 @@ void Game::handleEvents()
         }
     }
 }
+Quadtree Game::createQuadTree()
+{
+    Rect boundary = Rect(settings.width() / 2, settings.height() / 2,
+                         settings.width() / 2, settings.height() / 2);
+
+    Quadtree qtree = Quadtree(boundary, 8);
+    for (int i = 0; i < mAsteroids.size(); ++i)
+    {
+        qtree.insert(mAsteroids[i]);
+    }
+    for (int i = 0; i < mSmallAsteroids.size(); ++i)
+    {
+        qtree.insert(mSmallAsteroids[i]);
+    }
+    return qtree;
+}
+
 
 void Game::update()
 {
+    using namespace std::chrono;
+    auto time_cur = system_clock::now();
+    duration<float> ft = time_cur - mUpdateTime;
+    float delta = ft.count();
+    mUpdateTime = time_cur;
+
+    Quadtree qtree = createQuadTree();
+   
     if (mSmallAsteroids.activeCount() == 0 && mAsteroids.activeCount() == 0)
     {
         // Game won when all asteroids are destroyed
@@ -228,7 +254,11 @@ void Game::update()
             mPlayer->moveForward(mDelta, mWindowWidth, mWindowHeight, 2);
         }
         // Check objects collisions
-        mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
+        // mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
+
+        // Check objects collisions using Quadtree
+        mCollisions.qtree_update(qtree, mBullets, mAsteroids, mSmallAsteroids,
+                                 *mPlayer);
     }
 }
 

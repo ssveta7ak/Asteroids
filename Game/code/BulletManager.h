@@ -15,7 +15,7 @@ public:
     Bullet* spawnBullet();
     std::unique_ptr<Bullet>& operator[](const int index);
 
-    using BulletIterator = std::array<std::unique_ptr<Bullet>, 100>::iterator;
+    using BulletIterator = std::array<std::unique_ptr<Bullet>, 30>::iterator;
     BulletIterator begin() { return mBullets.begin(); }
     BulletIterator end() { return mBullets.end(); }
 
@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    static constexpr int COUNT = 100;
+    static constexpr int COUNT = 30;
     std::array<std::unique_ptr<Bullet>, COUNT> mBullets;
     std::vector<BulletSpawnListener*> mBulletSpawnListener;
 };

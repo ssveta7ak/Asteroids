@@ -60,7 +60,7 @@ float Object::radius() const
 bool Object::iscrossed(const Object& A, const Object& B)
 {
     float dist = Vector2::distance(A.center(), B.center());
-    if (dist <= (A.mRadius + B.mRadius))
+    if (dist <= (A.mRadius + B.mRadius + 1))
         return true;
     else
         return false;
@@ -85,4 +85,15 @@ void Object::setSpeed(float value)
 {
     const float MAX_SPEED = 150;
     mSpeed = (value < MAX_SPEED) ? value : MAX_SPEED;
+}
+
+Rect Object::getRectangle() const
+{
+    float x = position().x + mImage->width() / 2;
+    float y = position().y + mImage->height() / 2;
+    float w = mImage->width() / 2 + 20;
+    float h = mImage->height() / 2 + 20;
+
+    Rect rect = Rect(x, y, w, h);
+    return rect;
 }

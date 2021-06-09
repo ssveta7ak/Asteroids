@@ -137,3 +137,110 @@ void CollisionManager::update(BulletManager& bullets,
         }
     }
 }
+
+void CollisionManager::qtree_update(Quadtree& qtree, BulletManager& bullets,
+                  AsteroidManager& asteroids, AsteroidManager& smallAsteroids,
+                  Player& player)
+{
+    // check crossing bullet and asteroid
+    for (int i = 0; i < bullets.size(); ++i)
+    {
+        if (bullets[i]->isActive())
+        {
+            Rect rect = bullets[i]->getRectangle();
+            std::vector<Asteroid*> found = qtree.query(rect);
+            if (!found.empty())
+            {
+                for (auto asteroid : found)
+                {
+                    Object* obj1 = bullets[i].get();
+                    Object* obj2 = asteroid;
+
+                    // Check collision of two objects
+                    bool iscross = Object::iscrossed(*obj1, *obj2);
+                    if (iscross)
+                    {
+                        for (auto listener : mAsteroidDestroyedListener)
+                        {
+                            // Send event of asteroid destroying for listeners
+                            listener->onAsteroidDestroyed(*asteroid);
+                        }
+                        if (asteroid->isbig())
+                        {
+
+                            // Create two small asteroids after destroying big
+                            // asteroid
+                            for (int k = 0; k < smallAsteroids.size(); ++k)
+                            {
+                                if (!smallAsteroids[k].isActive())
+                                {
+                                    smallAsteroids[k].setActive(true);
+                                    smallAsteroids[k].setPosition(
+                                            asteroid->position());
+                                    ++smallAsteroids;
+                                    for (int t = k; t < smallAsteroids.size();
+                                         ++t)
+                                    {
+                                        if (!smallAsteroids[t].isActive())
+                                        {
+                                            smallAsteroids[t].setActive(true);
+                                            smallAsteroids[t].setPosition(
+                                                    asteroid->position());
+                                            ++smallAsteroids;
+                                            break;
+                                        }
+                                    }
+                                    break;
+                                }
+                            }
+                            // Decrease count of active big asteroids
+                            --asteroids;
+                        }
+                        else
+                        {
+                            // Decrease count of active small asteroids
+                            --smallAsteroids;
+                        }
+                        asteroid->reset();   // Set default properties
+                        bullets[i]->reset(); // Set default properties
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // check crossing player and asteroid
+    if (player.isActive())
+    {
+        Rect rectangle = player.getRectangle();
+        std::vector<Asteroid*> found = qtree.query(rectangle);
+        if (!found.empty())
+        {
+            for (auto asteroid : found)
+            {
+                bool iscross = Object::iscrossed(*asteroid, player);
+                if (iscross)
+                {
+                    for (auto listener : mPlayerKilledListener)
+                    {
+                        // Send event of player killing for listeners
+                        listener->onPlayerKilled(*asteroid);
+                    }
+                    if (asteroid->isbig())
+                    {
+                        // Decrease count of active big asteroids
+                        --asteroids;
+                    }
+                    else
+                    {
+                        // Decrease count of active small asteroids
+                        --smallAsteroids;
+                    }
+                    asteroid->reset(); // Set default properties
+                    return;
+                }
+            }
+        }
+    }
+}

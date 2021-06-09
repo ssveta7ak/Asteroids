@@ -166,6 +166,8 @@
     <ClCompile Include="code/SoundManager.cpp" />
     <ClCompile Include="code/UIManager.cpp" />
     <ClCompile Include="code/Vector2.cpp" />
+    <ClCompile Include="code\Quadtree.cpp" />
+    <ClCompile Include="code\Rect.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code/Animation.h" />
@@ -184,6 +186,8 @@
     <ClInclude Include="code/SoundManager.h" />
     <ClInclude Include="code/UIManager.h" />
     <ClInclude Include="code/Vector2.h" />
+    <ClInclude Include="code\Quadtree.h" />
+    <ClInclude Include="code\Rect.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -23,7 +23,7 @@ void Asteroid::init(SDL_Renderer* renderer, bool big, int width, int height)
         mSpeed = 40;
         mPosition = Vector2(-50, -50);
     }
-
+    isBig = big;
     mAngle = randomFloat(0.0, 2 * M_PI);
     mRadius = radius();
 }
