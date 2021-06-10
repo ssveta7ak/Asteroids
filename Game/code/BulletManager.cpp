@@ -35,15 +35,16 @@ void BulletManager::updateFireBullet(int windowWidth, int windowHeight,
 {
     for (std::unique_ptr<Bullet>& bullet : mBullets)
     {
-        if (bullet->isActive())
+        if (!bullet->isActive())
         {
-            bullet->update(delta);
-            bool isInWindow = bullet->isInsideWindow(windowWidth, windowHeight);
-            if (!isInWindow)
-            {
-                bullet->setActive(false);
-                bullet->setPosition(Vector2(0, 0));
-            }
+            continue;
+        }
+        bullet->update(delta);
+        bool isInWindow = bullet->isInsideWindow(windowWidth, windowHeight);
+        if (!isInWindow)
+        {
+            bullet->setActive(false);
+            bullet->setPosition(Vector2(0, 0));
         }
     }
 }

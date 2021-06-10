@@ -254,7 +254,7 @@ void Game::update()
             mPlayer->moveForward(mDelta, mWindowWidth, mWindowHeight, 2);
         }
         // Check objects collisions
-        // mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
+        //mCollisions.update(mBullets, mAsteroids, mSmallAsteroids, *mPlayer);
 
         // Check objects collisions using Quadtree
         mCollisions.qtree_update(qtree, mBullets, mAsteroids, mSmallAsteroids,

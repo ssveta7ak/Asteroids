@@ -19,7 +19,6 @@ private:
     Rect mBoundary;
     int mCapacity;
     bool isDivided = false;
-   // std::vector<Vector2> points;
     std::vector<Asteroid*> points;
 
     std::unique_ptr<Quadtree> mNorthEast;
