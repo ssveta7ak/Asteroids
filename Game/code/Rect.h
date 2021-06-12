@@ -17,6 +17,5 @@ public:
     
     bool contains(const Vector2& point) const;
     bool intersects(const Rect& rect) const;
-   
-    
+    Vector2 center() const { return Vector2(x, y); }
 };

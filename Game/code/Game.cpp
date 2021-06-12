@@ -200,12 +200,12 @@ void Game::handleEvents()
         }
     }
 }
-QuadtreeNode Game::createQuadTree()
+QuadtreeNode<Asteroid> Game::createQuadTree()
 {
     Rect boundary = Rect(settings.width() / 2, settings.height() / 2,
                          settings.width() / 2, settings.height() / 2);
 
-    QuadtreeNode qtree = QuadtreeNode(boundary, 8);
+    QuadtreeNode<Asteroid> qtree = QuadtreeNode<Asteroid>(boundary, 8);
     for (int i = 0; i < mAsteroids.size(); ++i)
     {
         qtree.insert(mAsteroids[i]);

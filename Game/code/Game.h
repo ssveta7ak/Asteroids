@@ -38,7 +38,7 @@ public:
     void initWindow(const char* title, int xpos, int ypos, int width,
                     int height, bool fullscreen);
 
-    QuadtreeNode createQuadTree();
+    QuadtreeNode<Asteroid> createQuadTree();
     void fireBullet();
     void deletePlayer();
     void newGame();

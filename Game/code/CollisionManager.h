@@ -11,7 +11,7 @@ public:
     void update(BulletManager& bullets, AsteroidManager& asteroids,
                 AsteroidManager& smallAsteroids, Player& player);
 
-    void qtree_update(QuadtreeNode& qtree, BulletManager& bullets, AsteroidManager& asteroids,
+    void qtree_update(QuadtreeNode<Asteroid>& qtree, BulletManager& bullets, AsteroidManager& asteroids,
                       AsteroidManager& smallAsteroids, Player& player);
 
     void addListener(AsteroidDestroyedListener* listener)
