@@ -3,7 +3,7 @@
 #include "AsteroidManager.h"
 #include "BulletManager.h"
 #include "Player.h"
-#include "Quadtree.h"
+#include "QuadtreeNode.h"
 
 class CollisionManager final
 {
@@ -11,7 +11,7 @@ public:
     void update(BulletManager& bullets, AsteroidManager& asteroids,
                 AsteroidManager& smallAsteroids, Player& player);
 
-    void qtree_update(Quadtree& qtree, BulletManager& bullets, AsteroidManager& asteroids,
+    void qtree_update(QuadtreeNode& qtree, BulletManager& bullets, AsteroidManager& asteroids,
                       AsteroidManager& smallAsteroids, Player& player);
 
     void addListener(AsteroidDestroyedListener* listener)

@@ -147,7 +147,7 @@ void CollisionManager::update(BulletManager& bullets,
     }
 }
 
-void CollisionManager::qtree_update(Quadtree& qtree, BulletManager& bullets,
+void CollisionManager::qtree_update(QuadtreeNode& qtree, BulletManager& bullets,
                   AsteroidManager& asteroids, AsteroidManager& smallAsteroids,
                   Player& player)
 {
@@ -159,7 +159,9 @@ void CollisionManager::qtree_update(Quadtree& qtree, BulletManager& bullets,
             continue;
         }
         Rect rect = bullets[i]->getRectangle();
-        std::vector<Asteroid*> found = qtree.query(rect);
+        std::vector<Asteroid*> found;
+       // std::vector<Asteroid*> found = qtree.query(rect);
+        qtree.query(rect, found);
         if (!found.empty())
         {
             for (auto asteroid : found)
@@ -224,7 +226,9 @@ void CollisionManager::qtree_update(Quadtree& qtree, BulletManager& bullets,
     if (player.isActive())
     {
         Rect rectangle = player.getRectangle();
-        std::vector<Asteroid*> found = qtree.query(rectangle);
+       // std::vector<Asteroid*> found = qtree.query(rectangle);
+        std::vector<Asteroid*> found;
+        qtree.query(rectangle, found);
         if (!found.empty())
         {
             for (auto asteroid : found)

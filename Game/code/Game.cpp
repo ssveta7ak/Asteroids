@@ -200,12 +200,12 @@ void Game::handleEvents()
         }
     }
 }
-Quadtree Game::createQuadTree()
+QuadtreeNode Game::createQuadTree()
 {
     Rect boundary = Rect(settings.width() / 2, settings.height() / 2,
                          settings.width() / 2, settings.height() / 2);
 
-    Quadtree qtree = Quadtree(boundary, 8);
+    QuadtreeNode qtree = QuadtreeNode(boundary, 8);
     for (int i = 0; i < mAsteroids.size(); ++i)
     {
         qtree.insert(mAsteroids[i]);
@@ -226,7 +226,7 @@ void Game::update()
     float delta = ft.count();
     mUpdateTime = time_cur;
 
-    Quadtree qtree = createQuadTree();
+    QuadtreeNode qtree = createQuadTree();
    
     if (mSmallAsteroids.activeCount() == 0 && mAsteroids.activeCount() == 0)
     {

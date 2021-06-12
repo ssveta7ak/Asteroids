@@ -11,7 +11,7 @@
 #include "Settings.h"
 #include "SoundManager.h"
 #include "UIManager.h"
-#include "Quadtree.h"
+#include "QuadtreeNode.h"
 #include <chrono>
 #include <memory>
 
@@ -38,7 +38,7 @@ public:
     void initWindow(const char* title, int xpos, int ypos, int width,
                     int height, bool fullscreen);
 
-    Quadtree createQuadTree();
+    QuadtreeNode createQuadTree();
     void fireBullet();
     void deletePlayer();
     void newGame();
